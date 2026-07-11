@@ -15,16 +15,13 @@ FILE_LOG_RETENTION = "7 days"
 def _compact_log_format(record):
     """Return the compact display format for a Loguru record.
 
-    Store the mapped display label in ``record["extra"]`` so Loguru's format
-    template can reference it. This localized formatting metadata leaves the
-    record's native level unchanged, preserving its filtering semantics.
+    Compute the display label locally so formatting leaves both the record's
+    native level and its caller-provided ``extra`` metadata unchanged.
     """
-    record["extra"]["level_label"] = LEVEL_LABELS.get(
-        record["level"].name, record["level"].name
-    )
+    level_label = LEVEL_LABELS.get(record["level"].name, record["level"].name)
     return (
         "<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
-        "<level>{extra[level_label]}</level> | "
+        f"<level>{level_label}</level> | "
         "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> | "
         "<level>{message}</level>\n{exception}"
     )
