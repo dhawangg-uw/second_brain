@@ -187,7 +187,10 @@ def test_compact_log_format_preserves_exceptions(capfd, log_file):
         '    raise ValueError("example failure")' in console_output
     )
     assert "ValueError: example failure" in console_output
-    assert "ValueError: example failure" in log_file.read_text()
+    file_output = log_file.read_text()
+    assert "{exception}" not in console_output
+    assert "{exception}" not in file_output
+    assert "ValueError: example failure" in file_output
 
 
 def test_main_logs_greeting(capfd, log_file):
