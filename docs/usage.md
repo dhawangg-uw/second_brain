@@ -23,6 +23,28 @@ Or as a Python module:
 uv run python -m second_brain
 ```
 
+## Log Output
+
+Console and file logs use the same compact layout:
+
+```text
+YYYY-MM-DD HH:mm:ss | LEVEL | module:function:line | message
+```
+
+The timestamp is written to whole-second precision. Level labels have no fixed
+padding and use the following display names:
+
+| Loguru level | Display label |
+|--------------|---------------|
+| `DEBUG`      | `DEBUG`       |
+| `INFO`       | `INFO`        |
+| `WARNING`    | `WARN`        |
+| `ERROR`      | `ERR`         |
+
+Levels not listed in the table retain their original Loguru names. These are
+display-only labels; filtering continues to use Loguru's original severity
+levels.
+
 ## Environment Variables
 
 | Variable    | Default    | Description                          |

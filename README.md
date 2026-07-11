@@ -57,6 +57,16 @@ uv run second_brain
 This is the installed CLI entry point. It writes an informational greeting to
 stderr and to `app.log` by default.
 
+Log entries use a compact shared format for both destinations:
+
+```text
+YYYY-MM-DD HH:mm:ss | LEVEL | module:function:line | message
+```
+
+Milliseconds and level padding are omitted. The standard `WARNING` and `ERROR`
+levels are displayed as `WARN` and `ERR`; `DEBUG` and `INFO` retain their names.
+Other Loguru levels retain their original names.
+
 ### Run with development settings
 
 Create your local environment file once:
