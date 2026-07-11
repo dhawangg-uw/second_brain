@@ -64,4 +64,4 @@ uv run second_brain
 ```
 
 Loguru creates the parent directories when needed. Rotated log files are kept
-for one week.
+for seven days.

@@ -9,7 +9,7 @@ LEVEL_LABELS = {
     "WARNING": "WARN",
     "ERROR": "ERR",
 }
-FILE_LOG_RETENTION = "1 week"
+FILE_LOG_RETENTION = "7 days"
 
 
 def _compact_log_format(record):

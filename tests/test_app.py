@@ -3,7 +3,7 @@ import re
 import pytest
 from loguru import logger
 
-from second_brain.app import configure_logging, main
+from second_brain.app import FILE_LOG_RETENTION, configure_logging, main
 
 EXPECTED_LABELS = {
     "debug message": "DEBUG",
@@ -93,6 +93,14 @@ def test_success_level_is_registered():
     _ensure_custom_levels_registered()
 
     assert logger.level("SUCCESS").no == CUSTOM_LEVELS["SUCCESS"]
+
+
+def test_retention_value_is_accepted(log_file):
+    """Verify that Loguru accepts the configured retention duration."""
+    configure_logging()
+
+    assert FILE_LOG_RETENTION == "7 days"
+    assert log_file.parent.exists()
 
 
 def test_compact_log_format_preserves_exceptions(capfd):
