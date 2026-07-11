@@ -53,3 +53,15 @@ levels.
 | `LOG_FILE`  | `app.log`  | Path to the log file                 |
 
 Copy `.env.example` to `.env` for development defaults, then run with `uv run --env-file .env`.
+
+### Windows log path
+
+In PowerShell, set an absolute Windows path before starting the application:
+
+```powershell
+$env:LOG_FILE = "C:\Users\you\AppData\Local\second-brain\app.log"
+uv run second_brain
+```
+
+Loguru creates the parent directories when needed. Rotated log files are kept
+for one week.
