@@ -26,9 +26,7 @@ def _assert_compact_lines(output):
         )
 
 
-def test_compact_log_format(capfd, tmp_path, monkeypatch):
-    log_file = tmp_path / "test.log"
-    monkeypatch.setenv("LOG_FILE", str(log_file))
+def test_compact_log_format(capfd, log_file):
     configure_logging()
 
     logger.debug("debug message")
@@ -43,9 +41,7 @@ def test_compact_log_format(capfd, tmp_path, monkeypatch):
     _assert_compact_lines(file_output)
 
 
-def test_configured_thresholds_are_preserved(capfd, tmp_path, monkeypatch):
-    log_file = tmp_path / "test.log"
-    monkeypatch.setenv("LOG_FILE", str(log_file))
+def test_configured_thresholds_are_preserved(capfd, log_file, monkeypatch):
     monkeypatch.setenv("LOG_LEVEL", "WARNING")
     configure_logging()
 
@@ -68,12 +64,8 @@ def test_configured_thresholds_are_preserved(capfd, tmp_path, monkeypatch):
     ("level_name", "expected_label"),
     [("SUCCESS", "SUCCESS"), ("TRACE", "TRACE")],
 )
-def test_custom_loguru_levels_retained(
-    level_name, expected_label, capfd, tmp_path, monkeypatch
-):
+def test_custom_loguru_levels_retained(level_name, expected_label, capfd, monkeypatch):
     """Verify that non-mapped Loguru levels retain their original names."""
-    log_file = tmp_path / "test.log"
-    monkeypatch.setenv("LOG_FILE", str(log_file))
     monkeypatch.setenv("LOG_LEVEL", "TRACE")
     configure_logging()
 
@@ -83,6 +75,26 @@ def test_custom_loguru_levels_retained(
     expected_output = f" | {expected_label} | "
 
     assert expected_output in console_output
+
+
+def test_compact_log_format_preserves_exceptions(capfd):
+    """Verify that exception details follow the compact log line."""
+    configure_logging()
+
+    try:
+        raise ValueError("example failure")
+    except ValueError:
+        logger.exception("operation failed")
+
+    console_output = capfd.readouterr().err
+
+    assert re.search(
+        r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"
+        r" \| ERR \| tests\.test_app:test_compact_log_format_preserves_exceptions:\d+"
+        r" \| operation failed\n",
+        console_output,
+    )
+    assert "ValueError: example failure" in console_output
 
 
 def test_main_logs_greeting(capfd):
