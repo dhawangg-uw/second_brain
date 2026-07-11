@@ -1,4 +1,6 @@
 import re
+from pathlib import PureWindowsPath
+from unittest.mock import patch
 
 import pytest
 from loguru import logger
@@ -118,6 +120,22 @@ def test_retention_value_is_accepted(log_file):
 
     assert FILE_LOG_RETENTION == "7 days"
     assert log_file.parent.exists()
+
+
+def test_windows_log_path_is_passed_to_file_sink(monkeypatch):
+    """Verify that Windows paths reach Loguru without reinterpretation."""
+    windows_log_file = PureWindowsPath(
+        "C:/Users/you/AppData/Local/second-brain/app.log"
+    )
+    monkeypatch.setenv("LOG_FILE", str(windows_log_file))
+
+    with (
+        patch("second_brain.app.logger.remove"),
+        patch("second_brain.app.logger.add") as add_sink,
+    ):
+        configure_logging()
+
+    assert add_sink.call_args_list[1].args[0] == str(windows_log_file)
 
 
 def test_compact_formatter_preserves_extra_metadata():

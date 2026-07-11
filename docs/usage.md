@@ -67,4 +67,5 @@ uv run second_brain
 ```
 
 Loguru creates the parent directories when needed. Rotated log files are kept
-for seven days.
+for seven days. PowerShell treats backslashes as literal path separators, and
+the application passes the configured value to Loguru without rewriting it.
