@@ -3,7 +3,12 @@ import re
 import pytest
 from loguru import logger
 
-from second_brain.app import FILE_LOG_RETENTION, configure_logging, main
+from second_brain.app import (
+    FILE_LOG_RETENTION,
+    _compact_log_format,
+    configure_logging,
+    main,
+)
 
 EXPECTED_LABELS = {
     "debug message": "DEBUG",
@@ -103,6 +108,18 @@ def test_retention_value_is_accepted(log_file):
 
     assert FILE_LOG_RETENTION == "7 days"
     assert log_file.parent.exists()
+
+
+def test_compact_formatter_preserves_extra_metadata():
+    """Verify that formatting does not mutate caller-provided metadata."""
+    record = {
+        "level": logger.level("INFO"),
+        "extra": {"request_id": "example-request"},
+    }
+
+    _compact_log_format(record)
+
+    assert record["extra"] == {"request_id": "example-request"}
 
 
 def test_compact_log_format_preserves_exceptions(capfd):
