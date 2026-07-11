@@ -76,6 +76,7 @@ def test_configured_thresholds_are_preserved(capfd, log_file, monkeypatch):
 )
 def test_custom_loguru_levels_retained(level_name, expected_label, capfd, monkeypatch):
     """Verify that non-mapped Loguru levels retain their original names."""
+    _ensure_custom_levels_registered()
     monkeypatch.setenv("LOG_LEVEL", "TRACE")
     configure_logging()
 
@@ -85,6 +86,13 @@ def test_custom_loguru_levels_retained(level_name, expected_label, capfd, monkey
     expected_output = f" | {expected_label} | "
 
     assert expected_output in console_output
+
+
+def test_success_level_is_registered():
+    """Verify that SUCCESS is available with its expected severity."""
+    _ensure_custom_levels_registered()
+
+    assert logger.level("SUCCESS").no == CUSTOM_LEVELS["SUCCESS"]
 
 
 def test_compact_log_format_preserves_exceptions(capfd):
