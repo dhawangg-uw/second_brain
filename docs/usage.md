@@ -31,6 +31,9 @@ Console and file logs use the same compact layout:
 YYYY-MM-DD HH:mm:ss | LEVEL | module:function:line | message
 ```
 
+The example is color-stripped, matching file and non-TTY output. On an
+interactive TTY, Loguru may add ANSI colors without changing the field layout.
+
 The timestamp is written to whole-second precision. Level labels have no fixed
 padding and use the following display names:
 

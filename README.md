@@ -63,6 +63,9 @@ Log entries use a compact shared format for both destinations:
 YYYY-MM-DD HH:mm:ss | LEVEL | module:function:line | message
 ```
 
+This is the color-stripped representation used in files and non-TTY output.
+Loguru may render the same fields with ANSI colors on an interactive terminal.
+
 Milliseconds and level padding are omitted. The standard `WARNING` and `ERROR`
 levels are displayed as `WARN` and `ERR`; `DEBUG` and `INFO` retain their names.
 Other Loguru levels retain their original names.
