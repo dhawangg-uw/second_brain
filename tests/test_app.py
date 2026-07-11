@@ -101,6 +101,14 @@ def test_configured_thresholds_are_preserved(capfd, log_file, monkeypatch):
     assert all(message in file_output for message in EXPECTED_LABELS)
 
 
+def test_invalid_log_level_is_rejected(monkeypatch):
+    """Document Loguru's failure behavior for an invalid console level."""
+    monkeypatch.setenv("LOG_LEVEL", "INVALID_LEVEL")
+
+    with pytest.raises(ValueError, match="Level 'INVALID_LEVEL' does not exist"):
+        configure_logging()
+
+
 @pytest.mark.parametrize(
     ("level_name", "expected_label"),
     [("SUCCESS", "SUCCESS"), ("TRACE", "TRACE")],
