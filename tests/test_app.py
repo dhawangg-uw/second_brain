@@ -30,7 +30,7 @@ def _assert_compact_lines(output):
     for line, (message, label) in zip(lines, EXPECTED_LABELS.items(), strict=True):
         assert re.fullmatch(
             rf"\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}}"
-            rf" \| {label} \| tests\.test_app:test_compact_log_format:\d+"
+            rf" \| {label} \| (?:[\w.]+\.)?test_app:test_compact_log_format:\d+"
             rf" \| {message}",
             line,
         )

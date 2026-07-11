@@ -24,7 +24,7 @@ YYYY-MM-DD HH:mm:ss | LEVEL | module:function:line | message
 
 ```python
 rf"\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}}"
-rf" \| {label} \| tests\.test_app:test_compact_log_format:\d+"
+rf" \| {label} \| (?:[\w.]+\.)?test_app:test_compact_log_format:\d+"
 rf" \| {message}"
 ```
 
@@ -33,12 +33,13 @@ rf" \| {message}"
 | Timestamp | `\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}` | `2026-07-11 14:30:45` |
 | Separator | ` \| ` | ` \| ` |
 | Level | `{label}` | `DEBUG`, `INFO`, `WARN`, or `ERR` |
-| Source | `tests\.test_app:test_compact_log_format:\d+` | `tests.test_app:test_compact_log_format:32` |
+| Source | `(?:[\w.]+\.)?test_app:test_compact_log_format:\d+` | `tests.test_app:test_compact_log_format:32` |
 | Message | `{message}` | `debug message` |
 
 The test uses `re.fullmatch()` so the complete line must conform to the format,
 with no unexpected leading or trailing content. It applies the same assertions
-to both the console and file sinks.
+to both the console and file sinks. The optional module prefix keeps source
+matching stable when a test runner imports `test_app` through a different path.
 
 ## Exception format regex
 
