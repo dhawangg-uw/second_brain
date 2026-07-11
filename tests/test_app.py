@@ -190,7 +190,8 @@ def test_compact_log_format_preserves_exceptions(capfd, log_file):
     assert "ValueError: example failure" in log_file.read_text()
 
 
-def test_main_logs_greeting(capfd):
+def test_main_logs_greeting(capfd, log_file):
     main()
     captured = capfd.readouterr()
     assert "Hello from second_brain!" in captured.err
+    assert "Hello from second_brain!" in log_file.read_text()
