@@ -25,9 +25,11 @@ def _ensure_custom_levels_registered():
 
 def _assert_compact_lines(output):
     lines = output.splitlines()
-    assert len(lines) == len(EXPECTED_LABELS)
+    expected_lines = list(EXPECTED_LABELS.items())
+    assert len(lines) == len(expected_lines)
 
-    for line, (message, label) in zip(lines, EXPECTED_LABELS.items(), strict=True):
+    for index, line in enumerate(lines):
+        message, label = expected_lines[index]
         assert re.fullmatch(
             rf"\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}}"
             rf" \| {label} \| (?:[\w.]+\.)?test_app:test_compact_log_format:\d+"
