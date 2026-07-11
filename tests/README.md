@@ -85,6 +85,9 @@ tests to read the same file that `configure_logging()` configures. The autouse
 always set before a test runs, even when that test does not request the path
 directly. Its teardown removes all Loguru handlers after every test to prevent
 the global logger singleton from leaking configuration into later tests.
+Access is guarded by a process-local lock, giving each test an isolated logger
+configuration window if a runner schedules tests concurrently in one process;
+multi-process runners already isolate Loguru through separate processes.
 
 Both application sinks explicitly use synchronous writes (`enqueue=False`), so
 tests can read the configured file immediately after emitting a log record

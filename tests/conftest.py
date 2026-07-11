@@ -2,9 +2,12 @@
 
 from collections.abc import Iterator
 from pathlib import Path
+from threading import Lock
 
 import pytest
 from loguru import logger
+
+_LOGGER_LOCK = Lock()
 
 
 @pytest.fixture
@@ -18,6 +21,7 @@ def log_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 
 @pytest.fixture(autouse=True)
 def _isolate_logger(log_file: Path) -> Iterator[None]:
-    """Configure the test log path and clean up Loguru after every test."""
-    yield
-    logger.remove()
+    """Serialize access to Loguru and clean up its global handlers per test."""
+    with _LOGGER_LOCK:
+        yield
+        logger.remove()
