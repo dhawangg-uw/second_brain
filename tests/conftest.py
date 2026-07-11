@@ -1,13 +1,22 @@
 """Shared test fixtures."""
 
+from collections.abc import Iterator
+from pathlib import Path
+
 import pytest
 from loguru import logger
 
 
-@pytest.fixture(autouse=True)
-def log_file(tmp_path, monkeypatch):
-    """Configure an isolated log file and clean up Loguru after each test."""
+@pytest.fixture
+def log_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Return the isolated log path configured for the current test."""
     path = tmp_path / "test.log"
     monkeypatch.setenv("LOG_FILE", str(path))
-    yield path
+    return path
+
+
+@pytest.fixture(autouse=True)
+def _isolate_logger(log_file: Path) -> Iterator[None]:
+    """Configure the test log path and clean up Loguru after every test."""
+    yield
     logger.remove()

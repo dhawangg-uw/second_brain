@@ -74,3 +74,12 @@ first line. A separate assertion checks that the traceback contains
 Together, these tests cover whole-second timestamps without milliseconds, pipe
 separators, mapped and fallback level labels, source locations, messages,
 exceptions, sink consistency, and configured filtering thresholds.
+
+## Fixture isolation
+
+The `log_file` fixture returns the exact `Path` assigned to `LOG_FILE`, allowing
+tests to read the same file that `configure_logging()` configures. The autouse
+`_isolate_logger` fixture depends on `log_file`, so the environment variable is
+always set before a test runs, even when that test does not request the path
+directly. Its teardown removes all Loguru handlers after every test to prevent
+the global logger singleton from leaking configuration into later tests.
