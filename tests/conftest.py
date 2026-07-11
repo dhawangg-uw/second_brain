@@ -11,6 +11,7 @@ from loguru import logger
 def log_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """Return the isolated log path configured for the current test."""
     path = tmp_path / "test.log"
+    # monkeypatch restores the previous environment value after the test.
     monkeypatch.setenv("LOG_FILE", str(path))
     return path
 
