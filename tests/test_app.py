@@ -1,3 +1,4 @@
+import os
 import re
 from pathlib import PureWindowsPath
 from unittest.mock import patch
@@ -68,6 +69,17 @@ def test_log_file_fixture_wires_configure_logging(log_file):
 
     assert log_file.is_file()
     assert "fixture path message" in log_file.read_text()
+
+
+def test_logger_state_is_isolated_per_worker(worker_id, log_file):
+    """Verify that each xdist process writes through its own logger state."""
+    configure_logging()
+    marker = f"worker={worker_id} pid={os.getpid()}"
+
+    logger.info(marker)
+
+    assert os.environ.get("PYTEST_XDIST_WORKER", "master") == worker_id
+    assert marker in log_file.read_text()
 
 
 def test_configured_thresholds_are_preserved(capfd, log_file, monkeypatch):
