@@ -150,6 +150,11 @@ def test_compact_log_format_preserves_exceptions(capfd):
         r" \| operation failed\n",
         console_output,
     )
+    assert "operation failed\nTraceback (most recent call last):" in console_output
+    assert (
+        "test_compact_log_format_preserves_exceptions\n"
+        '    raise ValueError("example failure")' in console_output
+    )
     assert "ValueError: example failure" in console_output
 
 
