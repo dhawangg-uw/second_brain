@@ -58,6 +58,16 @@ def test_compact_log_format(capfd, log_file):
     _assert_compact_lines(file_output)
 
 
+def test_log_file_fixture_wires_configure_logging(log_file):
+    """Verify that configuration writes to the fixture's temporary path."""
+    configure_logging()
+
+    logger.info("fixture path message")
+
+    assert log_file.is_file()
+    assert "fixture path message" in log_file.read_text()
+
+
 def test_configured_thresholds_are_preserved(capfd, log_file, monkeypatch):
     monkeypatch.setenv("LOG_LEVEL", "WARNING")
     configure_logging()
