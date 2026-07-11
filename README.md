@@ -100,7 +100,7 @@ Copy `.env.example` to `.env` for local development. Do not commit `.env` or
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `LOG_LEVEL` | `INFO` | Minimum level displayed on stderr. The development template uses `DEBUG`. |
-| `LOG_FILE` | `app.log` | File path for DEBUG-and-higher logs. The file rotates at 50 KB and retains one backup. |
+| `LOG_FILE` | `app.log` | File path for DEBUG-and-higher logs. Rotated files are retained for one week. |
 
 Tests load `.env.test` through pytest-env. The autouse test fixture redirects
 `LOG_FILE` to pytest's temporary directory, so a test run never writes `app.log`
