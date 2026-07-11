@@ -22,6 +22,8 @@ def log_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 @pytest.fixture(autouse=True)
 def _isolate_logger(log_file: Path) -> Iterator[None]:
     """Serialize access to Loguru and clean up its global handlers per test."""
+    # enqueue=False keeps all sink work inside this locked test window. xdist
+    # workers run in separate processes, each with its own logger and lock.
     with _LOGGER_LOCK:
         yield
         logger.remove()

@@ -123,6 +123,16 @@ Run tests with coverage (the project requires at least 80% coverage):
 uv run pytest --cov
 ```
 
+Run tests in parallel processes with pytest-xdist:
+
+```bash
+uv run pytest -n auto
+```
+
+Each xdist worker has its own process-local Loguru singleton. Within a worker,
+the test fixture locks logger configuration and uses synchronous sinks so one
+test is fully torn down before another can reconfigure the handlers.
+
 Check style and automatically format files:
 
 ```bash
