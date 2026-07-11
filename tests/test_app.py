@@ -118,7 +118,8 @@ def test_compact_log_format_preserves_exceptions(capfd):
 
     assert re.search(
         r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"
-        r" \| ERR \| tests\.test_app:test_compact_log_format_preserves_exceptions:\d+"
+        r" \| ERR \| (?:[\w.]+\.)?test_app:"
+        r"test_compact_log_format_preserves_exceptions:\d+"
         r" \| operation failed\n",
         console_output,
     )

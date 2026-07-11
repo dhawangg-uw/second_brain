@@ -48,7 +48,8 @@ exception record with:
 
 ```python
 r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"
-r" \| ERR \| tests\.test_app:test_compact_log_format_preserves_exceptions:\d+"
+r" \| ERR \| (?:[\w.]+\.)?test_app:"
+r"test_compact_log_format_preserves_exceptions:\d+"
 r" \| operation failed\n"
 ```
 
@@ -56,7 +57,7 @@ r" \| operation failed\n"
 | --- | --- | --- |
 | Timestamp | `\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}` | `2026-07-11 14:30:45` |
 | Level | `ERR` | `ERR` |
-| Source | `tests\.test_app:test_compact_log_format_preserves_exceptions:\d+` | `tests.test_app:test_compact_log_format_preserves_exceptions:87` |
+| Source | `(?:[\w.]+\.)?test_app:test_compact_log_format_preserves_exceptions:\d+` | `tests.test_app:test_compact_log_format_preserves_exceptions:87` |
 | Message and newline | `operation failed\n` | `operation failed` followed by a newline |
 
 This test uses `re.search()` because Loguru appends the traceback after the
