@@ -150,7 +150,7 @@ def test_compact_formatter_preserves_extra_metadata():
     assert record["extra"] == {"request_id": "example-request"}
 
 
-def test_compact_log_format_preserves_exceptions(capfd):
+def test_compact_log_format_preserves_exceptions(capfd, log_file):
     """Verify that exception details follow the compact log line."""
     configure_logging()
 
@@ -174,6 +174,7 @@ def test_compact_log_format_preserves_exceptions(capfd):
         '    raise ValueError("example failure")' in console_output
     )
     assert "ValueError: example failure" in console_output
+    assert "ValueError: example failure" in log_file.read_text()
 
 
 def test_main_logs_greeting(capfd):
