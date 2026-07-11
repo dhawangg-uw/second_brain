@@ -107,11 +107,12 @@ def test_custom_loguru_levels_retained(level_name, expected_label, capfd, monkey
     assert expected_output in console_output
 
 
-def test_success_level_is_registered():
+def test_success_level_is_registered(log_file):
     """Verify that SUCCESS is available with its expected severity."""
     _ensure_custom_levels_registered()
 
     assert logger.level("SUCCESS").no == CUSTOM_LEVELS["SUCCESS"]
+    assert log_file.parent.exists()
 
 
 def test_retention_value_is_accepted(log_file):
