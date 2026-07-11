@@ -11,6 +11,16 @@ EXPECTED_LABELS = {
     "warning message": "WARN",
     "error message": "ERR",
 }
+CUSTOM_LEVELS = {"SUCCESS": 25, "TRACE": 5}
+
+
+def _ensure_custom_levels_registered():
+    """Register custom levels when the installed Loguru lacks them."""
+    for level_name, level_number in CUSTOM_LEVELS.items():
+        try:
+            logger.level(level_name)
+        except ValueError:
+            logger.level(level_name, no=level_number)
 
 
 def _assert_compact_lines(output):
