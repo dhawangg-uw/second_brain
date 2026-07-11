@@ -1,3 +1,4 @@
+import os
 import sys
 
 from loguru import logger
@@ -35,8 +36,6 @@ def configure_logging():
     - stderr handler at LOG_LEVEL (default: INFO, configurable via env var)
     - File handler at DEBUG level writing to LOG_FILE (default: app.log)
     """
-    import os
-
     log_level = os.environ.get("LOG_LEVEL", "INFO")
     log_file = os.environ.get("LOG_FILE", "app.log")
     logger.remove()
