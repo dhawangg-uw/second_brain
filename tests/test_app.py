@@ -25,7 +25,9 @@ def _assert_compact_lines(output):
         )
 
 
-def test_compact_log_format(capfd, tmp_path):
+def test_compact_log_format(capfd, tmp_path, monkeypatch):
+    log_file = tmp_path / "test.log"
+    monkeypatch.setenv("LOG_FILE", str(log_file))
     configure_logging()
 
     logger.debug("debug message")
@@ -34,13 +36,15 @@ def test_compact_log_format(capfd, tmp_path):
     logger.error("error message")
 
     console_output = capfd.readouterr().err
-    file_output = (tmp_path / "test.log").read_text()
+    file_output = log_file.read_text()
 
     _assert_compact_lines(console_output)
     _assert_compact_lines(file_output)
 
 
 def test_configured_thresholds_are_preserved(capfd, tmp_path, monkeypatch):
+    log_file = tmp_path / "test.log"
+    monkeypatch.setenv("LOG_FILE", str(log_file))
     monkeypatch.setenv("LOG_LEVEL", "WARNING")
     configure_logging()
 
@@ -50,7 +54,7 @@ def test_configured_thresholds_are_preserved(capfd, tmp_path, monkeypatch):
     logger.error("error message")
 
     console_output = capfd.readouterr().err
-    file_output = (tmp_path / "test.log").read_text()
+    file_output = log_file.read_text()
 
     assert "debug message" not in console_output
     assert "info message" not in console_output
