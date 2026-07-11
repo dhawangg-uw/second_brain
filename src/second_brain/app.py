@@ -37,13 +37,19 @@ def configure_logging():
     log_level = os.environ.get("LOG_LEVEL", "INFO")
     log_file = os.environ.get("LOG_FILE", "app.log")
     logger.remove()
-    logger.add(sys.stderr, level=log_level, format=_compact_log_format)
+    logger.add(
+        sys.stderr,
+        level=log_level,
+        format=_compact_log_format,
+        enqueue=False,
+    )
     logger.add(
         log_file,
         level="DEBUG",
         format=_compact_log_format,
         rotation="50 KB",
         retention=FILE_LOG_RETENTION,
+        enqueue=False,
     )
 
 

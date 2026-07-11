@@ -85,3 +85,7 @@ tests to read the same file that `configure_logging()` configures. The autouse
 always set before a test runs, even when that test does not request the path
 directly. Its teardown removes all Loguru handlers after every test to prevent
 the global logger singleton from leaking configuration into later tests.
+
+Both application sinks explicitly use synchronous writes (`enqueue=False`), so
+tests can read the configured file immediately after emitting a log record
+without waiting for an asynchronous queue to drain.
