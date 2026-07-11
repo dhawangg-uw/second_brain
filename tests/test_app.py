@@ -1,5 +1,6 @@
 import re
 
+import pytest
 from loguru import logger
 
 from second_brain.app import configure_logging, main
@@ -61,6 +62,27 @@ def test_configured_thresholds_are_preserved(capfd, tmp_path, monkeypatch):
     assert "WARN" in console_output
     assert "ERR" in console_output
     assert all(message in file_output for message in EXPECTED_LABELS)
+
+
+@pytest.mark.parametrize(
+    ("level_name", "expected_label"),
+    [("SUCCESS", "SUCCESS"), ("TRACE", "TRACE")],
+)
+def test_custom_loguru_levels_retained(
+    level_name, expected_label, capfd, tmp_path, monkeypatch
+):
+    """Verify that non-mapped Loguru levels retain their original names."""
+    log_file = tmp_path / "test.log"
+    monkeypatch.setenv("LOG_FILE", str(log_file))
+    monkeypatch.setenv("LOG_LEVEL", "TRACE")
+    configure_logging()
+
+    logger.log(level_name, "custom level message")
+
+    console_output = capfd.readouterr().err
+    expected_output = f" | {expected_label} | "
+
+    assert expected_output in console_output
 
 
 def test_main_logs_greeting(capfd):

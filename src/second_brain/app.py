@@ -11,7 +11,12 @@ LEVEL_LABELS = {
 
 
 def _compact_log_format(record):
-    """Return the compact display format for a Loguru record."""
+    """Return the compact display format for a Loguru record.
+
+    Store the mapped display label in ``record["extra"]`` so Loguru's format
+    template can reference it. This localized formatting metadata leaves the
+    record's native level unchanged, preserving its filtering semantics.
+    """
     record["extra"]["level_label"] = LEVEL_LABELS.get(
         record["level"].name, record["level"].name
     )
