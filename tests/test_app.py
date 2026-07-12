@@ -85,8 +85,9 @@ def test_log_file_fixture_wires_configure_logging(log_file):
     assert "fixture path message" in _read_log_file(log_file)
 
 
-def test_logger_state_is_isolated_per_worker(worker_id, log_file):
+def test_logger_state_is_isolated_per_worker(request, log_file):
     """Verify that each xdist process writes through its own logger state."""
+    worker_id = getattr(request.config, "workerinput", {}).get("workerid", "master")
     configure_logging()
     marker = f"worker={worker_id} pid={os.getpid()}"
 
