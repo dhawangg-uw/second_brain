@@ -243,6 +243,16 @@ def test_invalid_level_does_not_partially_reconfigure_handlers(monkeypatch):
     add.assert_not_called()
 
 
+def test_invalid_level_is_rejected_before_configuration_lock(monkeypatch):
+    monkeypatch.setenv("LOG_LEVEL", "INVALID_LEVEL")
+
+    with patch("second_brain.app._CONFIGURE_LOCK") as configure_lock:
+        with pytest.raises(ValueError):
+            configure_logging()
+
+    configure_lock.__enter__.assert_not_called()
+
+
 def test_main_drains_logger_when_configuration_fails(monkeypatch):
     """Keep cleanup safe when startup rejects configuration before adding sinks."""
     monkeypatch.setenv("LOG_LEVEL", "INVALID_LEVEL")

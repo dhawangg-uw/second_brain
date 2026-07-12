@@ -88,14 +88,15 @@ def configure_logging():
         2026-07-11 12:34:56 | INFO | second_brain.app:main:99 | Hello
     """
     _require_loguru_api()
+    log_level = os.environ.get("LOG_LEVEL", "INFO")
+    log_file = os.environ.get("LOG_FILE", "app.log")
+    console_colorize = _env_flag("LOG_COLORIZE")
+    try:
+        logger.level(log_level)
+    except (TypeError, ValueError):
+        raise ValueError(f"Invalid LOG_LEVEL: {log_level!r}") from None
+
     with _CONFIGURE_LOCK:
-        log_level = os.environ.get("LOG_LEVEL", "INFO")
-        log_file = os.environ.get("LOG_FILE", "app.log")
-        console_colorize = _env_flag("LOG_COLORIZE")
-        try:
-            logger.level(log_level)
-        except (TypeError, ValueError):
-            raise ValueError(f"Invalid LOG_LEVEL: {log_level!r}") from None
         logger.remove()
         logger.add(
             sys.stderr,
