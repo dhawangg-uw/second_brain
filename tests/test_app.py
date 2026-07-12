@@ -186,11 +186,9 @@ def test_success_level_is_registered(log_file):
 
 def test_file_retention_is_preserved():
     """Verify that compact formatting does not change file retention."""
-    with (
-        patch("second_brain.app.logger.remove"),
-        patch("second_brain.app.logger.add") as add_sink,
-    ):
-        configure_logging()
+    with patch("second_brain.app.logger.remove"):
+        with patch("second_brain.app.logger.add") as add_sink:
+            configure_logging()
 
     assert _sink_call(add_sink, os.environ["LOG_FILE"]).kwargs["retention"] == 1
 
@@ -211,11 +209,9 @@ def test_file_rotation_preserves_compact_output(log_file):
 
 def test_configured_sink_color_modes():
     """Keep ANSI markup out of files while allowing terminal color detection."""
-    with (
-        patch("second_brain.app.logger.remove"),
-        patch("second_brain.app.logger.add") as add_sink,
-    ):
-        configure_logging()
+    with patch("second_brain.app.logger.remove"):
+        with patch("second_brain.app.logger.add") as add_sink:
+            configure_logging()
 
     stderr_call = _sink_call(add_sink, sys.stderr)
     file_call = _sink_call(add_sink, os.environ["LOG_FILE"])
@@ -230,11 +226,9 @@ def test_configured_sink_color_modes():
 def test_console_colors_can_be_enabled(monkeypatch):
     """Provide an opt-in escape hatch for interactive terminal colors."""
     monkeypatch.setenv("LOG_COLORIZE", "true")
-    with (
-        patch("second_brain.app.logger.remove"),
-        patch("second_brain.app.logger.add") as add_sink,
-    ):
-        configure_logging()
+    with patch("second_brain.app.logger.remove"):
+        with patch("second_brain.app.logger.add") as add_sink:
+            configure_logging()
 
     stderr_call = _sink_call(add_sink, sys.stderr)
     assert stderr_call.kwargs["colorize"] is True
@@ -260,11 +254,9 @@ def test_windows_log_path_is_passed_to_file_sink(monkeypatch):
     )
     monkeypatch.setenv("LOG_FILE", str(windows_log_file))
 
-    with (
-        patch("second_brain.app.logger.remove"),
-        patch("second_brain.app.logger.add") as add_sink,
-    ):
-        configure_logging()
+    with patch("second_brain.app.logger.remove"):
+        with patch("second_brain.app.logger.add") as add_sink:
+            configure_logging()
 
     file_call = next(
         call for call in add_sink.call_args_list if "rotation" in call.kwargs
@@ -296,9 +288,7 @@ def test_compact_formatter_preserves_extra_metadata():
     assert record["extra"] == {"request_id": "example-request"}
 
 
-@pytest.mark.parametrize(
-    ("record", "label"), [({}, "UNKNOWN"), ({"level": 20}, "20")]
-)
+@pytest.mark.parametrize(("record", "label"), [({}, "UNKNOWN"), ({"level": 20}, "20")])
 def test_compact_formatter_handles_nonstandard_level_shape(record, label):
     """Provide stable labels for missing or scalar external level values."""
     assert f"<level>{label}</level>" in _compact_log_format(record)
@@ -402,23 +392,19 @@ def test_main_logs_greeting(capfd, log_file):
 
 def test_main_logs_and_reraises_unexpected_errors():
     """Keep CLI failures visible to callers after Loguru records them."""
-    with (
-        patch("second_brain.app.configure_logging", side_effect=RuntimeError("boom")),
-        patch("second_brain.app.logger.complete") as complete,
-        pytest.raises(RuntimeError, match="boom"),
-    ):
-        main()
+    with patch("second_brain.app.configure_logging", side_effect=RuntimeError("boom")):
+        with patch("second_brain.app.logger.complete") as complete:
+            with pytest.raises(RuntimeError, match="boom"):
+                main()
 
     assert complete.call_count >= 1
 
 
 def test_main_flushes_queued_logs_on_normal_shutdown():
     """Drain asynchronous sinks before the CLI returns."""
-    with (
-        patch("second_brain.app.configure_logging"),
-        patch("second_brain.app.logger.info"),
-        patch("second_brain.app.logger.complete") as complete,
-    ):
-        main()
+    with patch("second_brain.app.configure_logging"):
+        with patch("second_brain.app.logger.info"):
+            with patch("second_brain.app.logger.complete") as complete:
+                main()
 
     assert complete.call_count >= 1
