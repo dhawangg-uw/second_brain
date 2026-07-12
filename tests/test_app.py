@@ -1,5 +1,6 @@
 import os
 import re
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import PureWindowsPath
 from unittest.mock import patch
 
@@ -79,6 +80,20 @@ def test_logger_state_is_isolated_per_worker(worker_id, log_file):
 
     assert os.environ.get("PYTEST_XDIST_WORKER", "master") == worker_id
     assert marker in log_file.read_text()
+
+
+def test_synchronous_file_sink_accepts_concurrent_writes(log_file):
+    """Verify Loguru serializes writes made concurrently by application threads."""
+    configure_logging()
+    messages = [f"thread message {index}" for index in range(20)]
+
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        list(executor.map(logger.info, messages))
+
+    logged_messages = [
+        line.rsplit(" | ", 1)[-1] for line in log_file.read_text().splitlines()
+    ]
+    assert sorted(logged_messages) == sorted(messages)
 
 
 def test_configured_thresholds_are_preserved(capfd, log_file, monkeypatch):
