@@ -15,6 +15,7 @@ from second_brain.app import (
     _compact_log_format,
     _env_flag,
     _plain_compact_log_format,
+    _prepare_log_parent,
     _require_loguru_api,
     configure_logging,
     main,
@@ -117,6 +118,14 @@ def test_log_file_fixture_wires_configure_logging(log_file):
 
     assert log_file.is_file()
     assert "fixture path message" in _read_log_file(log_file)
+
+
+def test_log_parent_validation_rejects_a_file(tmp_path):
+    parent = tmp_path / "not-a-directory"
+    parent.write_text("occupied")
+
+    with pytest.raises(ValueError, match="Invalid LOG_FILE parent"):
+        _prepare_log_parent(parent / "app.log")
 
 
 def test_logger_state_is_isolated_per_worker(request, log_file):

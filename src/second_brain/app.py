@@ -1,5 +1,6 @@
 import os
 import sys
+from pathlib import Path
 from threading import RLock
 
 from loguru import logger
@@ -30,6 +31,17 @@ def _env_flag(name, *, default=False):
     """Return a case-insensitive boolean flag from the environment."""
     fallback = "true" if default else "false"
     return os.environ.get(name, fallback).strip().lower() in TRUTHY_ENV_VALUES
+
+
+def _prepare_log_parent(log_file):
+    """Create and validate the configured log file's parent directory."""
+    parent = Path(log_file).expanduser().parent
+    try:
+        parent.mkdir(parents=True, exist_ok=True)
+    except OSError as error:
+        raise ValueError(f"Invalid LOG_FILE parent: {parent}") from error
+    if not parent.is_dir() or not os.access(parent, os.W_OK):
+        raise ValueError(f"LOG_FILE parent is not writable: {parent}")
 
 
 def _level_label(record):
@@ -100,6 +112,7 @@ def configure_logging():
         logger.level(log_level)
     except (TypeError, ValueError):
         raise ValueError(f"Invalid LOG_LEVEL: {log_level!r}") from None
+    _prepare_log_parent(log_file)
 
     with _CONFIGURE_LOCK:
         logger.remove()
