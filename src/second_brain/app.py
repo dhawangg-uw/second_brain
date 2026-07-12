@@ -33,7 +33,12 @@ def _env_flag(name, *, default=False):
 
 
 def _level_label(record):
-    """Return the compact display label for a Loguru record."""
+    """Return a label escaped once for Loguru's returned format template.
+
+    The caller must interpolate this value directly into a callable format's
+    template. Passing it through another formatting stage would double-escape
+    literal braces in custom level names.
+    """
     level = record.get("level")
     level_name = getattr(level, "name", None)
     if level_name is None:
