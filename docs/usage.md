@@ -84,6 +84,8 @@ $env:LOG_FILE = "C:\Users\you\AppData\Local\second-brain\app.log"
 uv run second_brain
 ```
 
-Loguru creates the parent directories when needed. PowerShell treats
-backslashes as literal path separators, and the application passes the
-configured value to Loguru without rewriting it.
+The application creates missing parent directories during startup and verifies
+that the target file can be opened before replacing Loguru's handlers. It
+reports a configuration error immediately when the directory or file is not
+writable. PowerShell treats backslashes as literal path separators, and the
+application passes the configured value to Loguru without rewriting it.

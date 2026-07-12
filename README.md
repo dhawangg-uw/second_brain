@@ -106,6 +106,10 @@ Copy `.env.example` to `.env` for local development. Do not commit `.env` or
 | `LOG_FILE` | `app.log` | File path for DEBUG-and-higher logs. The file rotates at 50 KB and retains one backup. |
 | `LOG_COLORIZE` | `false` | Set to `true`, `t`, `1`, `yes`, `y`, or `on` (case-insensitive) to enable ANSI colors on stderr. File logs remain plain text. |
 
+When `LOG_FILE` points into a directory tree that does not exist, startup
+creates the parent directories before configuring Loguru. Startup fails with a
+clear configuration error if the directory or file cannot be written.
+
 Tests load `.env.test` through pytest-env. The autouse test fixture redirects
 `LOG_FILE` to pytest's temporary directory, so a test run never writes `app.log`
 to the repository root.
