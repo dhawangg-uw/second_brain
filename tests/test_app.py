@@ -77,6 +77,19 @@ def test_compact_log_format(capfd, log_file):
     _assert_compact_standard_lines(file_output)
 
 
+def test_callable_formats_expand_record_placeholders(capfd, log_file):
+    """Verify Loguru expands templates returned by format callables."""
+    configure_logging()
+
+    logger.info("callable format integration")
+
+    for output in (capfd.readouterr().err, _read_log_file(log_file)):
+        assert "{name}" not in output
+        assert "{function}" not in output
+        assert " | second_brain.app:" not in output
+        assert "test_app:test_callable_formats_expand_record_placeholders:" in output
+
+
 def test_log_file_fixture_wires_configure_logging(log_file):
     """Verify that configuration writes to the fixture's temporary path."""
     configure_logging()
