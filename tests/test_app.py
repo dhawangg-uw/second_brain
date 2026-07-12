@@ -175,6 +175,20 @@ def test_file_retention_is_preserved():
     assert _sink_call(add_sink, os.environ["LOG_FILE"]).kwargs["retention"] == 1
 
 
+def test_file_rotation_preserves_compact_output(log_file):
+    """Exercise rotation and the single-backup retention policy together."""
+    configure_logging()
+
+    for index in range(3):
+        logger.info(f"rotation marker {index} " + "x" * 60_000)
+        logger.complete()
+
+    rotated_files = list(log_file.parent.glob(f"{log_file.stem}.*{log_file.suffix}"))
+    assert len(rotated_files) == 1
+    assert " | INFO | " in rotated_files[0].read_text()
+    assert log_file.is_file()
+
+
 def test_configured_sink_color_modes():
     """Keep ANSI markup out of files while allowing terminal color detection."""
     with (
