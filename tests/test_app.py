@@ -205,7 +205,10 @@ def test_windows_log_path_is_passed_to_file_sink(monkeypatch):
     ):
         configure_logging()
 
-    assert _sink_call(add_sink, str(windows_log_file)).args[0] == str(windows_log_file)
+    file_call = next(
+        call for call in add_sink.call_args_list if "rotation" in call.kwargs
+    )
+    assert PureWindowsPath(str(file_call.args[0])) == windows_log_file
 
 
 def test_compact_formatter_preserves_extra_metadata():
