@@ -287,9 +287,12 @@ def test_main_logs_and_reraises_unexpected_errors():
     """Keep CLI failures visible to callers after Loguru records them."""
     with (
         patch("second_brain.app.configure_logging", side_effect=RuntimeError("boom")),
+        patch("second_brain.app.logger.complete") as complete,
         pytest.raises(RuntimeError, match="boom"),
     ):
         main()
+
+    complete.assert_called_once_with()
 
 
 def test_main_flushes_queued_logs_on_normal_shutdown():

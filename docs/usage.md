@@ -53,8 +53,10 @@ base severity-sensitive alerting on structured native level data when available.
 
 The rotating file sink queues writes to avoid blocking application threads.
 The CLI drains this queue during normal shutdown so all submitted records reach
-the file before the process returns. An abrupt process termination can still
-prevent queued records from being written.
+the file before the process returns. Its `finally` block also performs the drain
+when logging setup or application work raises, before `logger.catch(reraise=True)`
+propagates the failure. An abrupt process termination can still prevent queued
+records from being written.
 
 ## Environment Variables
 
