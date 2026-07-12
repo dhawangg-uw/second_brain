@@ -223,10 +223,13 @@ def test_compact_formatter_preserves_extra_metadata():
     assert record["extra"] == {"request_id": "example-request"}
 
 
-@pytest.mark.parametrize("record", [{}, {"level": object()}])
-def test_compact_formatter_handles_malformed_level(record):
-    """Keep formatter construction safe for incomplete external records."""
-    assert "<level>UNKNOWN</level>" in _compact_log_format(record)
+@pytest.mark.parametrize(
+    ("record", "error"), [({}, KeyError), ({"level": object()}, AttributeError)]
+)
+def test_compact_formatter_rejects_malformed_level(record, error):
+    """Surface malformed external records instead of silently degrading them."""
+    with pytest.raises(error):
+        _compact_log_format(record)
 
 
 def test_compact_formatter_escapes_level_format_braces():
