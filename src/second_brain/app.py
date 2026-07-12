@@ -1,5 +1,6 @@
 import os
 import sys
+from threading import RLock
 
 from loguru import logger
 
@@ -10,6 +11,7 @@ LEVEL_LABELS = {
     "ERROR": "ERR",
 }
 TRUTHY_ENV_VALUES = {"1", "true", "t", "yes", "y", "on"}
+_CONFIGURE_LOCK = RLock()
 
 
 def _env_flag(name, *, default=False):
@@ -65,38 +67,42 @@ def configure_logging():
     Stderr writes synchronously so command-line feedback is immediate; queued
     serialization is reserved for the rotating file sink. Concurrent callers
     that require ordered console records should use the file output instead.
-    Call this once during single-threaded startup, before worker threads begin;
-    reconfiguration removes the currently installed handlers.
+    Prefer calling this once during startup. A process-local lock serializes
+    concurrent calls so each call snapshots its environment settings and
+    replaces both handlers as one configuration transaction.
 
     Example output::
 
         2026-07-11 12:34:56 | INFO | second_brain.app:main:99 | Hello
     """
-    log_level = os.environ.get("LOG_LEVEL", "INFO")
-    log_file = os.environ.get("LOG_FILE", "app.log")
-    console_colorize = _env_flag("LOG_COLORIZE")
-    try:
-        logger.level(log_level)
-    except (TypeError, ValueError):
-        raise ValueError(f"Invalid LOG_LEVEL: {log_level!r}") from None
-    logger.remove()
-    logger.add(
-        sys.stderr,
-        level=log_level,
-        format=_compact_log_format if console_colorize else _plain_compact_log_format,
-        colorize=console_colorize,
-        enqueue=False,
-    )
-    logger.add(
-        log_file,
-        level="DEBUG",
-        format=_plain_compact_log_format,
-        colorize=False,
-        # Issue #1 requires preserving the established file lifecycle policy.
-        rotation="50 KB",
-        retention=1,
-        enqueue=True,
-    )
+    with _CONFIGURE_LOCK:
+        log_level = os.environ.get("LOG_LEVEL", "INFO")
+        log_file = os.environ.get("LOG_FILE", "app.log")
+        console_colorize = _env_flag("LOG_COLORIZE")
+        try:
+            logger.level(log_level)
+        except (TypeError, ValueError):
+            raise ValueError(f"Invalid LOG_LEVEL: {log_level!r}") from None
+        logger.remove()
+        logger.add(
+            sys.stderr,
+            level=log_level,
+            format=(
+                _compact_log_format if console_colorize else _plain_compact_log_format
+            ),
+            colorize=console_colorize,
+            enqueue=False,
+        )
+        logger.add(
+            log_file,
+            level="DEBUG",
+            format=_plain_compact_log_format,
+            colorize=False,
+            # Issue #1 requires preserving the established file lifecycle policy.
+            rotation="50 KB",
+            retention=1,
+            enqueue=True,
+        )
 
 
 @logger.catch(reraise=True)

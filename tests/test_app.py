@@ -138,6 +138,39 @@ def test_queued_file_sink_accepts_concurrent_writes(log_file):
     assert sorted(logged_messages) == sorted(messages)
 
 
+def test_concurrent_configuration_replaces_handlers_atomically(log_file):
+    """Serialize remove/add transactions when startup callers overlap."""
+    events = []
+
+    with patch(
+        "second_brain.app.logger.remove", side_effect=lambda: events.append("R")
+    ):
+        with patch(
+            "second_brain.app.logger.add",
+            side_effect=lambda *_args, **_kwargs: events.append("A"),
+        ):
+            with ThreadPoolExecutor(max_workers=4) as executor:
+                list(executor.map(lambda _index: configure_logging(), range(8)))
+
+    assert events == ["R", "A", "A"] * 8
+    assert log_file.parent.exists()
+
+
+def test_reconfiguration_resnapshots_color_environment(monkeypatch):
+    """Apply LOG_COLORIZE changes made between complete configuration calls."""
+    with patch("second_brain.app.logger.remove"):
+        with patch("second_brain.app.logger.add") as add_sink:
+            configure_logging()
+            first_console = _sink_call(add_sink, sys.stderr)
+            monkeypatch.setenv("LOG_COLORIZE", "true")
+            add_sink.reset_mock()
+            configure_logging()
+            second_console = _sink_call(add_sink, sys.stderr)
+
+    assert first_console.kwargs.get("colorize") is False
+    assert second_console.kwargs.get("colorize") is True
+
+
 def test_queued_formatter_works_in_spawned_process(log_file):
     """Verify the module-level formatter works in a separate Python process."""
     env = os.environ | {"LOG_FILE": str(log_file)}
