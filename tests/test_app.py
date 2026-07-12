@@ -363,6 +363,17 @@ def test_compact_format_preserves_message_braces(capfd, log_file):
     assert expected in _read_log_file(log_file)
 
 
+def test_compact_format_preserves_braces_from_format_arguments(capfd, log_file):
+    """Keep braces literal after Loguru interpolates user format arguments."""
+    configure_logging()
+
+    logger.info("user payload: {}", "{nested.value}")
+
+    expected = "user payload: {nested.value}"
+    assert expected in capfd.readouterr().err
+    assert expected in _read_log_file(log_file)
+
+
 def test_compact_format_preserves_long_function_name(log_file):
     """Keep long source fields intact on a single compact log line."""
 
