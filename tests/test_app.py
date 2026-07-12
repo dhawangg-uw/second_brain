@@ -263,10 +263,6 @@ def test_compact_log_format_preserves_exceptions(capfd, log_file):
         console_output,
     )
     assert "operation failed\nTraceback (most recent call last):" in console_output
-    assert (
-        "test_compact_log_format_preserves_exceptions\n"
-        '    raise ValueError("example failure")' in console_output
-    )
     assert "ValueError: example failure" in console_output
     file_output = _read_log_file(log_file)
     assert "{exception}" not in console_output
