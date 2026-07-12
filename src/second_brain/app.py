@@ -11,22 +11,37 @@ LEVEL_LABELS = {
 }
 
 
+def _level_label(record):
+    """Return the compact display label for a Loguru record."""
+    try:
+        level_name = record["level"].name
+    except (KeyError, AttributeError):
+        level_name = "UNKNOWN"
+    return LEVEL_LABELS.get(level_name, level_name)
+
+
 def _compact_log_format(record):
     """Return the compact display format for a Loguru record.
 
     Compute the display label locally so formatting leaves both the record's
     native level and its caller-provided ``extra`` metadata unchanged.
     """
-    try:
-        level_name = record["level"].name
-    except (KeyError, AttributeError):
-        level_name = "UNKNOWN"
-    level_label = LEVEL_LABELS.get(level_name, level_name)
+    level_label = _level_label(record)
     return (
         "<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
         f"<level>{level_label}</level> | "
         "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> | "
         "<level>{message}</level>\n{exception}"
+    )
+
+
+def _plain_compact_log_format(record):
+    """Return a markup-free compact format for non-terminal sinks."""
+    level_label = _level_label(record)
+    return (
+        "{time:YYYY-MM-DD HH:mm:ss} | "
+        f"{level_label} | "
+        "{name}:{function}:{line} | {message}\n{exception}"
     )
 
 
@@ -50,7 +65,7 @@ def configure_logging():
     logger.add(
         log_file,
         level="DEBUG",
-        format=_compact_log_format,
+        format=_plain_compact_log_format,
         colorize=False,
         rotation="50 KB",
         retention=1,

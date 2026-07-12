@@ -9,6 +9,7 @@ from loguru import logger
 
 from second_brain.app import (
     _compact_log_format,
+    _plain_compact_log_format,
     configure_logging,
     main,
 )
@@ -171,6 +172,7 @@ def test_configured_sink_color_modes():
 
     assert add_sink.call_args_list[0].kwargs["colorize"] is None
     assert add_sink.call_args_list[1].kwargs["colorize"] is False
+    assert add_sink.call_args_list[1].kwargs["format"] is _plain_compact_log_format
 
 
 def test_windows_log_path_is_passed_to_file_sink(monkeypatch):
