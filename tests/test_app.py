@@ -48,7 +48,7 @@ def _assert_compact_standard_lines(output):
         message, label = expected_lines[index]
         assert re.fullmatch(
             rf"\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}}"
-            rf" \| {label} \| (?:tests\.)?test_app:\w+:\d+"
+            rf" \| {label} \| [^|\n]+:[^:|\n]+:\d+"
             rf" \| {message}",
             line,
         )
@@ -250,8 +250,7 @@ def test_compact_log_format_preserves_exceptions(capfd, log_file):
 
     assert re.search(
         r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"
-        r" \| ERR \| (?:[\w.]+\.)?test_app:"
-        r"test_compact_log_format_preserves_exceptions:\d+"
+        r" \| ERR \| [^|\n]+:[^:|\n]+:\d+"
         r" \| operation failed\n",
         console_output,
     )

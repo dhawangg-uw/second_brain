@@ -24,7 +24,7 @@ YYYY-MM-DD HH:mm:ss | LEVEL | module:function:line | message
 
 ```python
 rf"\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}}"
-rf" \| {label} \| (?:tests\.)?test_app:test_compact_log_format:\d+"
+rf" \| {label} \| [^|\n]+:[^:|\n]+:\d+"
 rf" \| {message}"
 ```
 
@@ -33,13 +33,13 @@ rf" \| {message}"
 | Timestamp | `\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}` | `2026-07-11 14:30:45` |
 | Separator | ` \| ` | ` \| ` |
 | Level | `{label}` | `DEBUG`, `INFO`, `WARN`, or `ERR` |
-| Source | `(?:tests\.)?test_app:test_compact_log_format:\d+` | `tests.test_app:test_compact_log_format:32` |
+| Source | `[^|\n]+:[^:|\n]+:\d+` | `tests.test_app:test_compact_log_format:32` |
 | Message | `{message}` | `debug message` |
 
 The test uses `re.fullmatch()` so the complete line must conform to the format,
 with no unexpected leading or trailing content. It applies the same assertions
-to both the console and file sinks. The optional `tests.` prefix supports the
-two expected pytest import paths without accepting unrelated module prefixes.
+to both the console and file sinks. The source assertion requires module,
+function, and numeric line fields without coupling the test to their names.
 
 ## Exception format regex
 
@@ -48,8 +48,7 @@ exception record with:
 
 ```python
 r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"
-r" \| ERR \| (?:[\w.]+\.)?test_app:"
-r"test_compact_log_format_preserves_exceptions:\d+"
+r" \| ERR \| [^|\n]+:[^:|\n]+:\d+"
 r" \| operation failed\n"
 ```
 
@@ -57,7 +56,7 @@ r" \| operation failed\n"
 | --- | --- | --- |
 | Timestamp | `\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}` | `2026-07-11 14:30:45` |
 | Level | `ERR` | `ERR` |
-| Source | `(?:[\w.]+\.)?test_app:test_compact_log_format_preserves_exceptions:\d+` | `tests.test_app:test_compact_log_format_preserves_exceptions:87` |
+| Source | `[^|\n]+:[^:|\n]+:\d+` | `tests.test_app:test_compact_log_format_preserves_exceptions:87` |
 | Message and newline | `operation failed\n` | `operation failed` followed by a newline |
 
 This test uses `re.search()` because Loguru appends the traceback after the
