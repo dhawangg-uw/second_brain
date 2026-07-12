@@ -299,6 +299,23 @@ def test_compact_formatter_escapes_level_format_braces():
     assert "CUSTOM{{value}} |" in _plain_compact_log_format({"level": level})
 
 
+def test_exotic_custom_level_renders_literally(capfd, log_file, monkeypatch):
+    """Render braces, colons, and percent signs safely in a real custom level."""
+    level_name = "EXOTIC:{value}%"
+    try:
+        logger.level(level_name)
+    except ValueError:
+        logger.level(level_name, no=35)
+    monkeypatch.setenv("LOG_LEVEL", "TRACE")
+    configure_logging()
+
+    logger.log(level_name, "exotic level message")
+
+    expected = f" | {level_name} | "
+    assert expected in capfd.readouterr().err
+    assert expected in _read_log_file(log_file)
+
+
 def test_compact_format_preserves_message_braces(capfd, log_file):
     """Treat braces in user-supplied record data as literal message text."""
     configure_logging()
