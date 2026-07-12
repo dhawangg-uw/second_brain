@@ -239,6 +239,17 @@ def test_compact_formatter_escapes_level_format_braces():
     assert "CUSTOM{{value}} |" in _plain_compact_log_format({"level": level})
 
 
+def test_compact_format_preserves_message_braces(capfd, log_file):
+    """Treat braces in user-supplied record data as literal message text."""
+    configure_logging()
+
+    logger.info("user payload: {name} {function} {message}")
+
+    expected = "user payload: {name} {function} {message}"
+    assert expected in capfd.readouterr().err
+    assert expected in _read_log_file(log_file)
+
+
 def test_compact_formatter_accepts_real_loguru_record():
     """Verify compatibility with records produced by the installed Loguru."""
     records = []
