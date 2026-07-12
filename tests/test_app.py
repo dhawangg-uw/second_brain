@@ -299,6 +299,16 @@ def test_file_retention_is_preserved(log_file):
     assert _sink_call(add_sink, str(log_file)).kwargs.get("retention") == 1
 
 
+def test_sink_setup_failure_removes_partial_configuration():
+    """Do not leave the console handler installed when file setup fails."""
+    with patch("second_brain.app.logger.remove") as remove:
+        with patch("second_brain.app.logger.add", side_effect=[1, OSError("denied")]):
+            with pytest.raises(RuntimeError, match="Failed to configure logging sinks"):
+                configure_logging()
+
+    assert remove.call_count == 2
+
+
 def test_file_rotation_preserves_compact_output(log_file):
     """Exercise rotation and the single-backup retention policy together."""
     configure_logging()

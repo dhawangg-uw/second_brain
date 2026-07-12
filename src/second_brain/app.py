@@ -103,25 +103,31 @@ def configure_logging():
 
     with _CONFIGURE_LOCK:
         logger.remove()
-        logger.add(
-            sys.stderr,
-            level=log_level,
-            format=(
-                _compact_log_format if console_colorize else _plain_compact_log_format
-            ),
-            colorize=console_colorize,
-            enqueue=False,
-        )
-        logger.add(
-            log_file,
-            level="DEBUG",
-            format=_plain_compact_log_format,
-            colorize=False,
-            # Issue #1 requires preserving the established file lifecycle policy.
-            rotation="50 KB",
-            retention=1,
-            enqueue=True,
-        )
+        try:
+            logger.add(
+                sys.stderr,
+                level=log_level,
+                format=(
+                    _compact_log_format
+                    if console_colorize
+                    else _plain_compact_log_format
+                ),
+                colorize=console_colorize,
+                enqueue=False,
+            )
+            logger.add(
+                log_file,
+                level="DEBUG",
+                format=_plain_compact_log_format,
+                colorize=False,
+                # Issue #1 requires preserving the established file lifecycle policy.
+                rotation="50 KB",
+                retention=1,
+                enqueue=True,
+            )
+        except Exception as error:
+            logger.remove()
+            raise RuntimeError("Failed to configure logging sinks") from error
 
 
 @logger.catch(reraise=True)
