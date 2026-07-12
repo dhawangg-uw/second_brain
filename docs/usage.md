@@ -48,7 +48,8 @@ padding and use the following display names:
 
 Levels not listed in the table retain their original Loguru names. These are
 display-only labels; filtering continues to use Loguru's original severity
-levels.
+levels. Downstream parsers should therefore accept unmapped display labels and
+base severity-sensitive alerting on structured native level data when available.
 
 ## Environment Variables
 
