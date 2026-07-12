@@ -1,5 +1,6 @@
 import importlib.metadata
 import os
+import pickle
 import re
 import subprocess
 import sys
@@ -154,6 +155,12 @@ def test_queued_formatter_works_in_spawned_process(log_file):
     )
 
     assert "spawned process message" in log_file.read_text()
+
+
+@pytest.mark.parametrize("formatter", [_compact_log_format, _plain_compact_log_format])
+def test_formatters_are_picklable_for_spawn_workers(formatter):
+    """Keep queued formatters importable by spawn-based multiprocessing."""
+    assert pickle.loads(pickle.dumps(formatter)) is formatter
 
 
 def test_configured_thresholds_are_preserved(capfd, log_file, monkeypatch):
