@@ -58,8 +58,8 @@ def configure_logging():
     logger.add(
         sys.stderr,
         level=log_level,
-        format=_compact_log_format,
-        colorize=None,
+        format=_plain_compact_log_format,
+        colorize=False,
         enqueue=False,
     )
     logger.add(

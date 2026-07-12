@@ -170,7 +170,8 @@ def test_configured_sink_color_modes():
     ):
         configure_logging()
 
-    assert add_sink.call_args_list[0].kwargs["colorize"] is None
+    assert add_sink.call_args_list[0].kwargs["colorize"] is False
+    assert add_sink.call_args_list[0].kwargs["format"] is _plain_compact_log_format
     assert add_sink.call_args_list[1].kwargs["colorize"] is False
     assert add_sink.call_args_list[1].kwargs["format"] is _plain_compact_log_format
 

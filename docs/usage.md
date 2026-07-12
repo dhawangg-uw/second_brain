@@ -31,10 +31,9 @@ Console and file logs use the same compact layout:
 YYYY-MM-DD HH:mm:ss | LEVEL | module:function:line | message
 ```
 
-The example is color-stripped, matching file and non-TTY output. On an
-interactive TTY, Loguru may add ANSI colors without changing the field layout.
-The configured file sink explicitly disables colors, while the stderr sink lets
-Loguru detect terminal support. Custom sinks and log aggregators should pass
+The configured stderr and file sinks explicitly disable ANSI colors, producing
+the same deterministic plain-text layout on terminals, CI runners, containers,
+and redirected output. Custom sinks and log aggregators should also pass
 `colorize=False` to `logger.add()` when they require plain text.
 
 The timestamp is written to whole-second precision. Level labels have no fixed
