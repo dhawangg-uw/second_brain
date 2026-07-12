@@ -506,6 +506,28 @@ def test_exotic_custom_level_renders_literally(capfd, log_file, monkeypatch):
     assert expected in _read_log_file(log_file)
 
 
+def test_exotic_custom_level_preserves_exception_output(capfd, log_file, monkeypatch):
+    """Escape an exotic level label while retaining its exception traceback."""
+    level_name = "EXCEPTION:{value}%"
+    try:
+        logger.level(level_name)
+    except ValueError:
+        logger.level(level_name, no=36)
+    monkeypatch.setenv("LOG_LEVEL", "TRACE")
+    configure_logging()
+
+    try:
+        raise ValueError("exotic exception failure")
+    except ValueError:
+        logger.opt(exception=True).log(level_name, "exotic exception message")
+
+    expected_label = f" | {level_name} | "
+    for output in (capfd.readouterr().err, _read_log_file(log_file)):
+        assert expected_label in output
+        assert "exotic exception message" in output
+        assert "ValueError: exotic exception failure" in output
+
+
 def test_compact_format_preserves_message_braces(capfd, log_file):
     """Treat braces in user-supplied record data as literal message text."""
     configure_logging()
