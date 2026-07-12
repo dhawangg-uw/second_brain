@@ -291,6 +291,23 @@ def test_compact_format_preserves_message_braces(capfd, log_file):
     assert expected in _read_log_file(log_file)
 
 
+def test_compact_format_preserves_long_function_name(log_file):
+    """Keep long source fields intact on a single compact log line."""
+
+    def function_with_an_intentionally_long_name_for_source_location_coverage():
+        logger.info("long source message")
+
+    configure_logging()
+    function_with_an_intentionally_long_name_for_source_location_coverage()
+
+    output = _read_log_file(log_file)
+    assert (
+        "function_with_an_intentionally_long_name_for_source_location_coverage"
+        in output
+    )
+    assert len(output.splitlines()) == 1
+
+
 def test_compact_formatter_accepts_real_loguru_record():
     """Verify compatibility with records produced by the installed Loguru."""
     records = []
