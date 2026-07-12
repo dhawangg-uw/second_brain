@@ -51,6 +51,11 @@ display-only labels; filtering continues to use Loguru's original severity
 levels. Downstream parsers should therefore accept unmapped display labels and
 base severity-sensitive alerting on structured native level data when available.
 
+The rotating file sink queues writes to avoid blocking application threads.
+The CLI drains this queue during normal shutdown so all submitted records reach
+the file before the process returns. An abrupt process termination can still
+prevent queued records from being written.
+
 ## Environment Variables
 
 | Variable    | Default    | Description                          |

@@ -287,3 +287,15 @@ def test_main_logs_and_reraises_unexpected_errors():
         pytest.raises(RuntimeError, match="boom"),
     ):
         main()
+
+
+def test_main_flushes_queued_logs_on_normal_shutdown():
+    """Drain asynchronous sinks before the CLI returns."""
+    with (
+        patch("second_brain.app.configure_logging"),
+        patch("second_brain.app.logger.info"),
+        patch("second_brain.app.logger.complete") as complete,
+    ):
+        main()
+
+    complete.assert_called_once_with()

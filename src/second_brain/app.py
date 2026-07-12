@@ -81,5 +81,8 @@ def main():
 
     Configures logging and prints a greeting to verify the setup works.
     """
-    configure_logging()
-    logger.info("Hello from second_brain!")
+    try:
+        configure_logging()
+        logger.info("Hello from second_brain!")
+    finally:
+        logger.complete()
