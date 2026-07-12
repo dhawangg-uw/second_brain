@@ -17,7 +17,8 @@ def _level_label(record):
         level_name = record["level"].name
     except (KeyError, AttributeError):
         level_name = "UNKNOWN"
-    return LEVEL_LABELS.get(level_name, level_name)
+    label = LEVEL_LABELS.get(level_name, level_name)
+    return label.replace("{", "{{").replace("}", "}}")
 
 
 def _compact_log_format(record):
