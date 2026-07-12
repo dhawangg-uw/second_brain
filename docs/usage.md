@@ -59,6 +59,10 @@ when logging setup or application work raises, before `logger.catch(reraise=True
 propagates the failure. An abrupt process termination can still prevent queued
 records from being written.
 
+The queued file handler uses a module-level formatter so it remains importable
+and picklable for spawn-based multiprocessing workers. Each spawned process
+must configure and complete its own process-local Loguru handlers.
+
 ## Environment Variables
 
 | Variable    | Default    | Description                          |

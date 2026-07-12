@@ -1,5 +1,6 @@
 import os
 import re
+import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import PureWindowsPath
@@ -97,7 +98,7 @@ def test_logger_state_is_isolated_per_worker(request, log_file):
     assert marker in _read_log_file(log_file)
 
 
-def test_synchronous_file_sink_accepts_concurrent_writes(log_file):
+def test_queued_file_sink_accepts_concurrent_writes(log_file):
     """Verify Loguru serializes writes made concurrently by application threads."""
     configure_logging()
     messages = [f"thread message {index}" for index in range(20)]
@@ -109,6 +110,25 @@ def test_synchronous_file_sink_accepts_concurrent_writes(log_file):
         line.rsplit(" | ", 1)[-1] for line in _read_log_file(log_file).splitlines()
     ]
     assert sorted(logged_messages) == sorted(messages)
+
+
+def test_queued_formatter_works_in_spawned_process(log_file):
+    """Verify the module-level formatter works in a separate Python process."""
+    env = os.environ | {"LOG_FILE": str(log_file)}
+    subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "from loguru import logger; "
+            "from second_brain.app import configure_logging; "
+            "configure_logging(); logger.info('spawned process message'); "
+            "logger.complete()",
+        ],
+        check=True,
+        env=env,
+    )
+
+    assert "spawned process message" in log_file.read_text()
 
 
 def test_configured_thresholds_are_preserved(capfd, log_file, monkeypatch):
