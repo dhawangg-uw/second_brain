@@ -314,7 +314,9 @@ def test_windows_log_path_is_passed_to_file_sink(monkeypatch):
     file_call = next(
         call for call in add_sink.call_args_list if "rotation" in call.kwargs
     )
-    assert PureWindowsPath(str(file_call.args[0])) == windows_log_file
+    actual = str(file_call.args[0]).replace("\\", "/").casefold()
+    expected = str(windows_log_file).replace("\\", "/").casefold()
+    assert actual == expected
 
 
 @pytest.mark.skipif(sys.platform != "win32", reason="Windows integration coverage")
