@@ -14,6 +14,18 @@ TRUTHY_ENV_VALUES = {"1", "true", "t", "yes", "y", "on"}
 _CONFIGURE_LOCK = RLock()
 
 
+def _require_loguru_api():
+    """Fail clearly when the installed Loguru lacks required queue APIs."""
+    missing = [
+        name
+        for name in ("catch", "complete")
+        if not callable(getattr(logger, name, None))
+    ]
+    if missing:
+        names = ", ".join(f"logger.{name}()" for name in missing)
+        raise RuntimeError(f"Loguru 0.7.3 or newer is required; missing API: {names}")
+
+
 def _env_flag(name, *, default=False):
     """Return a case-insensitive boolean flag from the environment."""
     fallback = "true" if default else "false"
@@ -75,6 +87,7 @@ def configure_logging():
 
         2026-07-11 12:34:56 | INFO | second_brain.app:main:99 | Hello
     """
+    _require_loguru_api()
     with _CONFIGURE_LOCK:
         log_level = os.environ.get("LOG_LEVEL", "INFO")
         log_file = os.environ.get("LOG_FILE", "app.log")

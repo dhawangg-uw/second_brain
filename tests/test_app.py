@@ -15,6 +15,7 @@ from second_brain.app import (
     _compact_log_format,
     _env_flag,
     _plain_compact_log_format,
+    _require_loguru_api,
     configure_logging,
     main,
 )
@@ -36,6 +37,12 @@ def test_minimum_loguru_api_contract():
     assert version >= (0, 7, 3)
     assert callable(logger.complete)
     assert callable(logger.catch)
+
+
+def test_missing_loguru_api_has_clear_runtime_error():
+    with patch.object(logger, "complete", None):
+        with pytest.raises(RuntimeError, match="Loguru 0.7.3 or newer"):
+            _require_loguru_api()
 
 
 def _ensure_custom_levels_registered():
