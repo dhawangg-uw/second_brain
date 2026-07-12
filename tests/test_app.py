@@ -241,6 +241,18 @@ def test_console_colors_can_be_enabled(monkeypatch):
     assert stderr_call.kwargs["format"] is _compact_log_format
 
 
+def test_file_sink_stays_plain_when_console_colors_enabled(log_file, monkeypatch):
+    """Never allow terminal markup or ANSI escapes into the file sink."""
+    monkeypatch.setenv("LOG_COLORIZE", "true")
+    configure_logging()
+
+    logger.info("colored console plain file")
+
+    file_output = _read_log_file(log_file)
+    assert "<level>" not in file_output
+    assert "\x1b[" not in file_output
+
+
 def test_windows_log_path_is_passed_to_file_sink(monkeypatch):
     """Verify that Windows paths reach Loguru without reinterpretation."""
     windows_log_file = PureWindowsPath(
