@@ -52,6 +52,10 @@ def configure_logging():
 
     Both sinks intentionally share the compact field layout required by issue
     #1. Sink-specific behavior belongs in handler options, not separate layouts.
+
+    Example output::
+
+        2026-07-11 12:34:56 | INFO | second_brain.app:main:99 | Hello
     """
     log_level = os.environ.get("LOG_LEVEL", "INFO")
     log_file = os.environ.get("LOG_FILE", "app.log")
