@@ -154,7 +154,7 @@ def test_invalid_log_level_is_rejected(monkeypatch):
     """Document Loguru's failure behavior for an invalid console level."""
     monkeypatch.setenv("LOG_LEVEL", "INVALID_LEVEL")
 
-    with pytest.raises(ValueError, match="Level 'INVALID_LEVEL' does not exist"):
+    with pytest.raises(ValueError, match="^Invalid LOG_LEVEL: 'INVALID_LEVEL'$"):
         configure_logging()
 
 

@@ -68,6 +68,10 @@ def configure_logging():
         "yes",
         "on",
     }
+    try:
+        logger.level(log_level)
+    except (TypeError, ValueError):
+        raise ValueError(f"Invalid LOG_LEVEL: {log_level!r}") from None
     logger.remove()
     logger.add(
         sys.stderr,
