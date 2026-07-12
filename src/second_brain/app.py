@@ -157,6 +157,8 @@ def configure_logging():
             logger.add(
                 log_file,
                 level="DEBUG",
+                # File output is canonical plain text regardless of LOG_COLORIZE;
+                # color opt-in applies only to the interactive stderr sink.
                 format=_plain_compact_log_format,
                 colorize=False,
                 # Issue #1 requires preserving the established file lifecycle policy.
