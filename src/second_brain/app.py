@@ -44,12 +44,14 @@ def configure_logging():
         sys.stderr,
         level=log_level,
         format=_compact_log_format,
+        colorize=None,
         enqueue=False,
     )
     logger.add(
         log_file,
         level="DEBUG",
         format=_compact_log_format,
+        colorize=False,
         rotation="50 KB",
         retention=1,
         enqueue=False,

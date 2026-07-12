@@ -160,6 +160,18 @@ def test_file_retention_is_preserved():
     assert add_sink.call_args_list[1].kwargs["retention"] == 1
 
 
+def test_configured_sink_color_modes():
+    """Keep ANSI markup out of files while allowing terminal color detection."""
+    with (
+        patch("second_brain.app.logger.remove"),
+        patch("second_brain.app.logger.add") as add_sink,
+    ):
+        configure_logging()
+
+    assert add_sink.call_args_list[0].kwargs["colorize"] is None
+    assert add_sink.call_args_list[1].kwargs["colorize"] is False
+
+
 def test_windows_log_path_is_passed_to_file_sink(monkeypatch):
     """Verify that Windows paths reach Loguru without reinterpretation."""
     windows_log_file = PureWindowsPath(
