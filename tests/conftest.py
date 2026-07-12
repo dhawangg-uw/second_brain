@@ -18,7 +18,11 @@ def log_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 
 @pytest.fixture(autouse=True)
 def _isolate_logger(log_file: Path) -> Iterator[None]:
-    """Clean up the process-local Loguru singleton after each test."""
+    """Configure every test's path, then clean up its process-local logger.
+
+    Depending on ``log_file`` is intentional: pytest resolves that fixture and
+    sets ``LOG_FILE`` even when the test function does not request it directly.
+    """
     yield
     logger.complete()
     logger.remove()
