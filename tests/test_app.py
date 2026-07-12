@@ -183,6 +183,17 @@ def test_invalid_log_level_is_rejected(monkeypatch):
         configure_logging()
 
 
+def test_main_drains_logger_when_configuration_fails(monkeypatch):
+    """Keep cleanup safe when startup rejects configuration before adding sinks."""
+    monkeypatch.setenv("LOG_LEVEL", "INVALID_LEVEL")
+
+    with patch("second_brain.app.logger.complete") as complete:
+        with pytest.raises(ValueError, match="^Invalid LOG_LEVEL"):
+            main()
+
+    assert complete.call_count >= 1
+
+
 @pytest.mark.parametrize(
     ("level_name", "expected_label"),
     [("SUCCESS", "SUCCESS"), ("TRACE", "TRACE")],
