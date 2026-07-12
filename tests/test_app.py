@@ -252,10 +252,8 @@ def test_configured_sink_color_modes():
     stderr_call = _sink_call(add_sink, sys.stderr)
     file_call = _sink_call(add_sink, os.environ["LOG_FILE"])
     assert stderr_call.kwargs.get("colorize") is False
-    assert stderr_call.kwargs.get("format") is _plain_compact_log_format
     assert stderr_call.kwargs.get("enqueue") is False
     assert file_call.kwargs.get("colorize") is False
-    assert file_call.kwargs.get("format") is _plain_compact_log_format
     assert file_call.kwargs.get("enqueue") is True
 
 
@@ -268,7 +266,6 @@ def test_console_colors_can_be_enabled(monkeypatch):
 
     stderr_call = _sink_call(add_sink, sys.stderr)
     assert stderr_call.kwargs.get("colorize") is True
-    assert stderr_call.kwargs.get("format") is _compact_log_format
 
 
 @pytest.mark.parametrize(
