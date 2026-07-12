@@ -212,6 +212,18 @@ def test_windows_log_path_is_passed_to_file_sink(monkeypatch):
     assert PureWindowsPath(str(file_call.args[0])) == windows_log_file
 
 
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows integration coverage")
+def test_windows_log_path_creates_file(tmp_path, monkeypatch):
+    """Verify Loguru creates and writes the configured file on Windows."""
+    log_file = tmp_path / "windows-test.log"
+    monkeypatch.setenv("LOG_FILE", str(log_file))
+    configure_logging()
+
+    logger.info("windows file message")
+
+    assert "windows file message" in _read_log_file(log_file)
+
+
 def test_compact_formatter_preserves_extra_metadata():
     """Verify that formatting does not mutate caller-provided metadata."""
     record = {
