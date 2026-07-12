@@ -20,7 +20,7 @@ YYYY-MM-DD HH:mm:ss | LEVEL | module:function:line | message
 
 ## Main format regex
 
-`_assert_compact_lines()` validates each standard log line with:
+`_assert_compact_standard_lines()` validates each standard log line with:
 
 ```python
 rf"\d{{4}}-\d{{2}}-\d{{2}} \d{{2}}:\d{{2}}:\d{{2}}"

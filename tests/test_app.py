@@ -31,7 +31,8 @@ def _ensure_custom_levels_registered():
             logger.level(level_name, no=level_number)
 
 
-def _assert_compact_lines(output):
+def _assert_compact_standard_lines(output):
+    """Assert the four single-line records; exceptions use dedicated assertions."""
     lines = output.splitlines()
     expected_lines = list(EXPECTED_LABELS.items())
     assert len(lines) == len(expected_lines)
@@ -57,8 +58,8 @@ def test_compact_log_format(capfd, log_file):
     console_output = capfd.readouterr().err
     file_output = log_file.read_text()
 
-    _assert_compact_lines(console_output)
-    _assert_compact_lines(file_output)
+    _assert_compact_standard_lines(console_output)
+    _assert_compact_standard_lines(file_output)
 
 
 def test_log_file_fixture_wires_configure_logging(log_file):
