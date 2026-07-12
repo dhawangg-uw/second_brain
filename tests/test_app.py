@@ -207,6 +207,20 @@ def test_configured_sink_color_modes():
     assert file_call.kwargs["enqueue"] is True
 
 
+def test_console_colors_can_be_enabled(monkeypatch):
+    """Provide an opt-in escape hatch for interactive terminal colors."""
+    monkeypatch.setenv("LOG_COLORIZE", "true")
+    with (
+        patch("second_brain.app.logger.remove"),
+        patch("second_brain.app.logger.add") as add_sink,
+    ):
+        configure_logging()
+
+    stderr_call = _sink_call(add_sink, sys.stderr)
+    assert stderr_call.kwargs["colorize"] is True
+    assert stderr_call.kwargs["format"] is _compact_log_format
+
+
 def test_windows_log_path_is_passed_to_file_sink(monkeypatch):
     """Verify that Windows paths reach Loguru without reinterpretation."""
     windows_log_file = PureWindowsPath(

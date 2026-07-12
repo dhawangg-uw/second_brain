@@ -63,8 +63,8 @@ Log entries use a compact shared format for both destinations:
 YYYY-MM-DD HH:mm:ss | LEVEL | module:function:line | message
 ```
 
-Both configured sinks use this deterministic plain-text representation,
-including on interactive terminals.
+Both configured sinks use this deterministic plain-text representation by
+default. Terminal colors can be enabled for stderr with `LOG_COLORIZE`.
 
 Milliseconds and level padding are omitted. The standard `WARNING` and `ERROR`
 levels are displayed as `WARN` and `ERR`; `DEBUG` and `INFO` retain their names.
@@ -104,6 +104,7 @@ Copy `.env.example` to `.env` for local development. Do not commit `.env` or
 | --- | --- | --- |
 | `LOG_LEVEL` | `INFO` | Minimum level displayed on stderr. The development template uses `DEBUG`. |
 | `LOG_FILE` | `app.log` | File path for DEBUG-and-higher logs. The file rotates at 50 KB and retains one backup. |
+| `LOG_COLORIZE` | `false` | Set to `true`, `1`, `yes`, or `on` to enable ANSI colors on stderr. File logs remain plain text. |
 
 Tests load `.env.test` through pytest-env. The autouse test fixture redirects
 `LOG_FILE` to pytest's temporary directory, so a test run never writes `app.log`

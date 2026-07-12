@@ -52,12 +52,18 @@ def configure_logging():
     """
     log_level = os.environ.get("LOG_LEVEL", "INFO")
     log_file = os.environ.get("LOG_FILE", "app.log")
+    console_colorize = os.environ.get("LOG_COLORIZE", "false").lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
     logger.remove()
     logger.add(
         sys.stderr,
         level=log_level,
-        format=_plain_compact_log_format,
-        colorize=False,
+        format=_compact_log_format if console_colorize else _plain_compact_log_format,
+        colorize=console_colorize,
         enqueue=False,
     )
     logger.add(

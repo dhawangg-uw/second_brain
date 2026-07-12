@@ -31,9 +31,10 @@ Console and file logs use the same compact layout:
 YYYY-MM-DD HH:mm:ss | LEVEL | module:function:line | message
 ```
 
-The configured stderr and file sinks explicitly disable ANSI colors, producing
+The configured stderr and file sinks disable ANSI colors by default, producing
 the same deterministic plain-text layout on terminals, CI runners, containers,
-and redirected output. Custom sinks and log aggregators should also pass
+and redirected output. Set `LOG_COLORIZE=true` to opt into colors on stderr;
+the file remains plain text. Custom sinks and log aggregators should pass
 `colorize=False` to `logger.add()` when they require plain text.
 
 The timestamp is written to whole-second precision. Level labels have no fixed
@@ -64,6 +65,7 @@ records from being written.
 |-------------|------------|--------------------------------------|
 | `LOG_LEVEL` | `INFO`     | Console log level (DEBUG, INFO, …)   |
 | `LOG_FILE`  | `app.log`  | Path to the log file                 |
+| `LOG_COLORIZE` | `false` | Enable ANSI colors on stderr with `true`, `1`, `yes`, or `on` |
 
 Copy `.env.example` to `.env` for development defaults, then run with `uv run --env-file .env`.
 
