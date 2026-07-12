@@ -188,6 +188,12 @@ def test_compact_formatter_preserves_extra_metadata():
     assert record["extra"] == {"request_id": "example-request"}
 
 
+@pytest.mark.parametrize("record", [{}, {"level": object()}])
+def test_compact_formatter_handles_malformed_level(record):
+    """Keep formatter construction safe for incomplete external records."""
+    assert "<level>UNKNOWN</level>" in _compact_log_format(record)
+
+
 def test_compact_log_format_preserves_exceptions(capfd, log_file):
     """Verify that exception details follow the compact log line."""
     configure_logging()

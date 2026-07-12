@@ -17,7 +17,11 @@ def _compact_log_format(record):
     Compute the display label locally so formatting leaves both the record's
     native level and its caller-provided ``extra`` metadata unchanged.
     """
-    level_label = LEVEL_LABELS.get(record["level"].name, record["level"].name)
+    try:
+        level_name = record["level"].name
+    except (KeyError, AttributeError):
+        level_name = "UNKNOWN"
+    level_label = LEVEL_LABELS.get(level_name, level_name)
     return (
         "<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
         f"<level>{level_label}</level> | "
