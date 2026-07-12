@@ -220,13 +220,13 @@ def test_success_level_is_registered(log_file):
     assert log_file.parent.exists()
 
 
-def test_file_retention_is_preserved():
+def test_file_retention_is_preserved(log_file):
     """Verify that compact formatting does not change file retention."""
     with patch("second_brain.app.logger.remove"):
         with patch("second_brain.app.logger.add") as add_sink:
             configure_logging()
 
-    assert _sink_call(add_sink, os.environ["LOG_FILE"]).kwargs.get("retention") == 1
+    assert _sink_call(add_sink, str(log_file)).kwargs.get("retention") == 1
 
 
 def test_file_rotation_preserves_compact_output(log_file):
@@ -243,14 +243,14 @@ def test_file_rotation_preserves_compact_output(log_file):
     assert log_file.is_file()
 
 
-def test_configured_sink_color_modes():
+def test_configured_sink_color_modes(log_file):
     """Keep ANSI markup out of files while allowing terminal color detection."""
     with patch("second_brain.app.logger.remove"):
         with patch("second_brain.app.logger.add") as add_sink:
             configure_logging()
 
     stderr_call = _sink_call(add_sink, sys.stderr)
-    file_call = _sink_call(add_sink, os.environ["LOG_FILE"])
+    file_call = _sink_call(add_sink, str(log_file))
     assert stderr_call.kwargs.get("colorize") is False
     assert stderr_call.kwargs.get("enqueue") is False
     assert file_call.kwargs.get("colorize") is False
