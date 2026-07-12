@@ -18,6 +18,12 @@ record therefore has this shape:
 YYYY-MM-DD HH:mm:ss | LEVEL | module:function:line | message
 ```
 
+`WARN` and `ERR` are display-only aliases for Loguru's native `WARNING` and
+`ERROR` levels. The formatter does not mutate `record["level"]`, so filtering,
+handler thresholds, and structured consumers retain the original severity.
+Only text parsers need to recognize the shorter labels. `DEBUG` and `INFO`
+remain unchanged.
+
 ## Main format regex
 
 `_assert_compact_standard_lines()` validates each standard log line with:
