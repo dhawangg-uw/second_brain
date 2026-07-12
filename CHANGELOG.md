@@ -18,3 +18,13 @@ Before upgrading, operators should update log-parser patterns to accept
 whole-second timestamps, the `WARN` and `ERR` display labels, and pipe
 separators. Alerting rules should continue matching native severity values when
 they consume structured Loguru records.
+
+Text-only collectors can extract the display level with this parser fragment:
+
+```regex
+^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} \| (?P<level>[^|]+?) \|
+```
+
+For text-based severity alerts, map `WARN` back to `WARNING` and `ERR` back to
+`ERROR`; accept other captured values as custom Loguru display levels. Prefer
+the native level field whenever the collector supports structured records.
