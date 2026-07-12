@@ -161,7 +161,7 @@ def configure_logging():
                 # color opt-in applies only to the interactive stderr sink.
                 format=_plain_compact_log_format,
                 colorize=False,
-                # Issue #1 requires preserving the established file lifecycle policy.
+                # Preserve the file policy: rotate at 50 KB and retain one backup.
                 rotation="50 KB",
                 retention=1,
                 enqueue=True,
