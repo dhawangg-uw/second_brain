@@ -183,6 +183,19 @@ def test_invalid_log_level_is_rejected(monkeypatch):
         configure_logging()
 
 
+def test_invalid_level_does_not_partially_reconfigure_handlers(monkeypatch):
+    """Validate first so a rejected setting leaves installed handlers intact."""
+    monkeypatch.setenv("LOG_LEVEL", "INVALID_LEVEL")
+
+    with patch("second_brain.app.logger.remove") as remove:
+        with patch("second_brain.app.logger.add") as add:
+            with pytest.raises(ValueError):
+                configure_logging()
+
+    remove.assert_not_called()
+    add.assert_not_called()
+
+
 def test_main_drains_logger_when_configuration_fails(monkeypatch):
     """Keep cleanup safe when startup rejects configuration before adding sinks."""
     monkeypatch.setenv("LOG_LEVEL", "INVALID_LEVEL")
