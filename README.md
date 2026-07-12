@@ -127,12 +127,13 @@ uv run pytest --cov
 Run tests in parallel processes with pytest-xdist:
 
 ```bash
-uv run pytest -n auto
+uv run --group parallel pytest -n auto
 ```
 
-Each xdist worker has its own process-local Loguru singleton. Within a worker,
-the test fixture locks logger configuration and uses synchronous sinks so one
-test is fully torn down before another can reconfigure the handlers.
+`pytest-xdist` and `execnet` live in the optional `parallel` dependency group,
+so standard development and CI environments do not install process-level test
+tooling unless they run this job. Each worker has its own process-local Loguru
+singleton, and fixture teardown drains queued records before removing handlers.
 
 Check style and automatically format files:
 

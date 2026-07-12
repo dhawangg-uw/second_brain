@@ -666,8 +666,10 @@ dev = [
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "pytest-env" },
-    { name = "pytest-xdist" },
     { name = "ruff" },
+]
+parallel = [
+    { name = "pytest-xdist" },
 ]
 
 [package.metadata]
@@ -681,9 +683,9 @@ dev = [
     { name = "pytest", specifier = ">=8.0" },
     { name = "pytest-cov", specifier = ">=6.0" },
     { name = "pytest-env", specifier = ">=1.1" },
-    { name = "pytest-xdist", specifier = ">=3.8" },
     { name = "ruff", specifier = ">=0.11" },
 ]
+parallel = [{ name = "pytest-xdist", specifier = ">=3.8" }]
 
 [[package]]
 name = "six"

@@ -19,11 +19,11 @@ dev = [
     "pytest>=8.0",
     "pytest-cov>=6.0",
     "pytest-env>=1.1",
-    "pytest-xdist>=3.8",
     "mkdocs>=1.6",
     "mkdocs-material>=9.6",
     "mkdocstrings[python]>=0.27",
 ]
+parallel = ["pytest-xdist>=3.8"]
 
 [tool.ruff]
 line-length = 88
