@@ -9,6 +9,13 @@ LEVEL_LABELS = {
     "WARNING": "WARN",
     "ERROR": "ERR",
 }
+TRUTHY_ENV_VALUES = {"1", "true", "yes", "on"}
+
+
+def _env_flag(name, *, default=False):
+    """Return a case-insensitive boolean flag from the environment."""
+    fallback = "true" if default else "false"
+    return os.environ.get(name, fallback).strip().lower() in TRUTHY_ENV_VALUES
 
 
 def _level_label(record):
@@ -64,12 +71,7 @@ def configure_logging():
     """
     log_level = os.environ.get("LOG_LEVEL", "INFO")
     log_file = os.environ.get("LOG_FILE", "app.log")
-    console_colorize = os.environ.get("LOG_COLORIZE", "false").lower() in {
-        "1",
-        "true",
-        "yes",
-        "on",
-    }
+    console_colorize = _env_flag("LOG_COLORIZE")
     try:
         logger.level(log_level)
     except (TypeError, ValueError):

@@ -11,6 +11,7 @@ from loguru import logger
 
 from second_brain.app import (
     _compact_log_format,
+    _env_flag,
     _plain_compact_log_format,
     configure_logging,
     main,
@@ -233,6 +234,26 @@ def test_console_colors_can_be_enabled(monkeypatch):
     stderr_call = _sink_call(add_sink, sys.stderr)
     assert stderr_call.kwargs.get("colorize") is True
     assert stderr_call.kwargs.get("format") is _compact_log_format
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("1", True),
+        ("true", True),
+        ("TRUE", True),
+        (" yes ", True),
+        ("on", True),
+        ("0", False),
+        ("false", False),
+        ("off", False),
+        ("", False),
+    ],
+)
+def test_environment_flag_parsing(value, expected, monkeypatch):
+    """Keep documented truthy values and falsey fallbacks synchronized."""
+    monkeypatch.setenv("EXAMPLE_FLAG", value)
+    assert _env_flag("EXAMPLE_FLAG") is expected
 
 
 def test_file_sink_stays_plain_when_console_colors_enabled(log_file, monkeypatch):
