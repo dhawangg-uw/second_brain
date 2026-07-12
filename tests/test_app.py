@@ -190,7 +190,7 @@ def test_file_retention_is_preserved():
         with patch("second_brain.app.logger.add") as add_sink:
             configure_logging()
 
-    assert _sink_call(add_sink, os.environ["LOG_FILE"]).kwargs["retention"] == 1
+    assert _sink_call(add_sink, os.environ["LOG_FILE"]).kwargs.get("retention") == 1
 
 
 def test_file_rotation_preserves_compact_output(log_file):
@@ -215,12 +215,12 @@ def test_configured_sink_color_modes():
 
     stderr_call = _sink_call(add_sink, sys.stderr)
     file_call = _sink_call(add_sink, os.environ["LOG_FILE"])
-    assert stderr_call.kwargs["colorize"] is False
-    assert stderr_call.kwargs["format"] is _plain_compact_log_format
-    assert stderr_call.kwargs["enqueue"] is False
-    assert file_call.kwargs["colorize"] is False
-    assert file_call.kwargs["format"] is _plain_compact_log_format
-    assert file_call.kwargs["enqueue"] is True
+    assert stderr_call.kwargs.get("colorize") is False
+    assert stderr_call.kwargs.get("format") is _plain_compact_log_format
+    assert stderr_call.kwargs.get("enqueue") is False
+    assert file_call.kwargs.get("colorize") is False
+    assert file_call.kwargs.get("format") is _plain_compact_log_format
+    assert file_call.kwargs.get("enqueue") is True
 
 
 def test_console_colors_can_be_enabled(monkeypatch):
@@ -231,8 +231,8 @@ def test_console_colors_can_be_enabled(monkeypatch):
             configure_logging()
 
     stderr_call = _sink_call(add_sink, sys.stderr)
-    assert stderr_call.kwargs["colorize"] is True
-    assert stderr_call.kwargs["format"] is _compact_log_format
+    assert stderr_call.kwargs.get("colorize") is True
+    assert stderr_call.kwargs.get("format") is _compact_log_format
 
 
 def test_file_sink_stays_plain_when_console_colors_enabled(log_file, monkeypatch):
