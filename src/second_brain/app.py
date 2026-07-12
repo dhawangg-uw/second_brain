@@ -168,4 +168,6 @@ def main():
         configure_logging()
         logger.info("Hello from second_brain!")
     finally:
+        # Drain production work here; test teardown drains again defensively so
+        # tests that call configure_logging() without main() are also isolated.
         logger.complete()
