@@ -62,6 +62,8 @@ records from being written.
 The queued file handler uses a module-level formatter so it remains importable
 and picklable for spawn-based multiprocessing workers. Each spawned process
 must configure and complete its own process-local Loguru handlers.
+Call `configure_logging()` during single-threaded process startup. It replaces
+all existing handlers and is not a live-reconfiguration API for active workers.
 
 ## Environment Variables
 

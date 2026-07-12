@@ -55,6 +55,8 @@ def configure_logging():
 
     Both sinks intentionally share the compact field layout required by issue
     #1. Sink-specific behavior belongs in handler options, not separate layouts.
+    Call this once during single-threaded startup, before worker threads begin;
+    reconfiguration removes the currently installed handlers.
 
     Example output::
 
