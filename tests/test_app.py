@@ -265,12 +265,11 @@ def test_compact_formatter_preserves_extra_metadata():
 
 
 @pytest.mark.parametrize(
-    ("record", "error"), [({}, KeyError), ({"level": object()}, AttributeError)]
+    ("record", "label"), [({}, "UNKNOWN"), ({"level": 20}, "20")]
 )
-def test_compact_formatter_rejects_malformed_level(record, error):
-    """Surface malformed external records instead of silently degrading them."""
-    with pytest.raises(error):
-        _compact_log_format(record)
+def test_compact_formatter_handles_nonstandard_level_shape(record, label):
+    """Provide stable labels for missing or scalar external level values."""
+    assert f"<level>{label}</level>" in _compact_log_format(record)
 
 
 def test_compact_formatter_escapes_level_format_braces():

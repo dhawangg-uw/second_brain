@@ -13,7 +13,10 @@ LEVEL_LABELS = {
 
 def _level_label(record):
     """Return the compact display label for a Loguru record."""
-    level_name = record["level"].name
+    level = record.get("level")
+    level_name = getattr(level, "name", None)
+    if level_name is None:
+        level_name = "UNKNOWN" if level is None else str(level)
     label = LEVEL_LABELS.get(level_name, level_name)
     return label.replace("{", "{{").replace("}", "}}")
 
