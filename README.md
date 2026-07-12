@@ -8,7 +8,7 @@ documentation.
 
 The project uses these conventions:
 
-- **Python:** 3.13 or newer
+- **Python:** 3.11 or newer
 - **Package manager and build tool:** [uv](https://docs.astral.sh/uv/)
 - **Build backend:** `uv_build`
 - **Package layout:** source code lives in `src/second_brain/`
@@ -131,6 +131,7 @@ uv run --group parallel pytest -n auto
 ```
 
 `pytest-xdist` and `execnet` live in the optional `parallel` dependency group,
+which is locked in `uv.lock` and installed only when `--group parallel` is used,
 so standard development and CI environments do not install process-level test
 tooling unless they run this job. Each worker has its own process-local Loguru
 singleton, and fixture teardown drains queued records before removing handlers.
