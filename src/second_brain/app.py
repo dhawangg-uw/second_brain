@@ -53,6 +53,16 @@ def _prepare_log_parent(log_file):
         raise ValueError(f"LOG_FILE parent is not writable: {parent}")
 
 
+def _preflight_log_file(log_file):
+    """Verify the configured file can be opened before replacing handlers."""
+    path = Path(log_file).expanduser()
+    try:
+        with path.open("a", encoding="utf-8"):
+            pass
+    except (OSError, ValueError) as error:
+        raise ValueError(f"LOG_FILE cannot be opened: {path}") from error
+
+
 def _level_label(record):
     """Return a label escaped once for Loguru's returned format template.
 
@@ -128,6 +138,7 @@ def configure_logging():
     except (TypeError, ValueError):
         raise ValueError(f"Invalid LOG_LEVEL: {log_level!r}") from None
     _prepare_log_parent(log_file)
+    _preflight_log_file(log_file)
 
     with _CONFIGURE_LOCK:
         logger.remove()

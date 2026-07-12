@@ -16,6 +16,7 @@ from second_brain.app import (
     _env_flag,
     _plain_compact_log_format,
     _prepare_log_parent,
+    _preflight_log_file,
     _require_loguru_api,
     configure_logging,
     main,
@@ -126,6 +127,11 @@ def test_log_parent_validation_rejects_a_file(tmp_path):
 
     with pytest.raises(ValueError, match="Invalid LOG_FILE parent"):
         _prepare_log_parent(parent / "app.log")
+
+
+def test_log_file_preflight_rejects_invalid_target():
+    with pytest.raises(ValueError, match="LOG_FILE cannot be opened"):
+        _preflight_log_file("invalid\0app.log")
 
 
 def test_logger_state_is_isolated_per_worker(request, log_file):
@@ -422,9 +428,10 @@ def test_windows_log_path_is_passed_to_file_sink(monkeypatch):
     )
     monkeypatch.setenv("LOG_FILE", str(windows_log_file))
 
-    with patch("second_brain.app.logger.remove"):
-        with patch("second_brain.app.logger.add") as add_sink:
-            configure_logging()
+    with patch("second_brain.app._preflight_log_file"):
+        with patch("second_brain.app.logger.remove"):
+            with patch("second_brain.app.logger.add") as add_sink:
+                configure_logging()
 
     file_call = next(
         call for call in add_sink.call_args_list if "rotation" in call.kwargs
