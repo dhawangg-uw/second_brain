@@ -49,6 +49,9 @@ def configure_logging():
     Removes the default handler and sets up:
     - stderr handler at LOG_LEVEL (default: INFO, configurable via env var)
     - File handler at DEBUG level writing to LOG_FILE (default: app.log)
+
+    Both sinks intentionally share the compact field layout required by issue
+    #1. Sink-specific behavior belongs in handler options, not separate layouts.
     """
     log_level = os.environ.get("LOG_LEVEL", "INFO")
     log_file = os.environ.get("LOG_FILE", "app.log")
