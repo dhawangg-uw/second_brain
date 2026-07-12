@@ -193,6 +193,17 @@ def test_reconfiguration_resnapshots_color_environment(monkeypatch):
     assert second_console.kwargs.get("colorize") is True
 
 
+def test_reconfiguration_does_not_accumulate_handlers(capfd, log_file):
+    """Verify repeated configuration still emits one record per active sink."""
+    configure_logging()
+    configure_logging()
+
+    logger.info("single handler marker")
+
+    assert capfd.readouterr().err.count("single handler marker") == 1
+    assert _read_log_file(log_file).count("single handler marker") == 1
+
+
 def test_queued_formatter_works_in_spawned_process(log_file):
     """Verify the module-level formatter works in a separate Python process."""
     env = os.environ | {"LOG_FILE": str(log_file)}
