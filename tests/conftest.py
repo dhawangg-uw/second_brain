@@ -22,8 +22,9 @@ def log_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 @pytest.fixture(autouse=True)
 def _isolate_logger(log_file: Path) -> Iterator[None]:
     """Serialize handler reconfiguration and clean up Loguru after each test."""
-    # enqueue=False keeps all sink work inside this locked test window. xdist
-    # workers run in separate processes, each with its own logger and lock.
+    # Each xdist worker has its own logger and lock. Complete the queued file
+    # sink before removing handlers so records cannot leak across test teardown.
     with _LOGGER_LOCK:
         yield
+        logger.complete()
         logger.remove()

@@ -69,7 +69,7 @@ def configure_logging():
         colorize=False,
         rotation="50 KB",
         retention=1,
-        enqueue=False,
+        enqueue=True,
     )
 
 

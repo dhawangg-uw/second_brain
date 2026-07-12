@@ -32,6 +32,12 @@ def _ensure_custom_levels_registered():
             logger.level(level_name, no=level_number)
 
 
+def _read_log_file(log_file):
+    """Wait for queued file records, then return their text."""
+    logger.complete()
+    return log_file.read_text()
+
+
 def _assert_compact_standard_lines(output):
     """Assert the four single-line records; exceptions use dedicated assertions."""
     lines = output.splitlines()
@@ -57,7 +63,7 @@ def test_compact_log_format(capfd, log_file):
     logger.error("error message")
 
     console_output = capfd.readouterr().err
-    file_output = log_file.read_text()
+    file_output = _read_log_file(log_file)
 
     _assert_compact_standard_lines(console_output)
     _assert_compact_standard_lines(file_output)
@@ -70,7 +76,7 @@ def test_log_file_fixture_wires_configure_logging(log_file):
     logger.info("fixture path message")
 
     assert log_file.is_file()
-    assert "fixture path message" in log_file.read_text()
+    assert "fixture path message" in _read_log_file(log_file)
 
 
 def test_logger_state_is_isolated_per_worker(worker_id, log_file):
@@ -81,7 +87,7 @@ def test_logger_state_is_isolated_per_worker(worker_id, log_file):
     logger.info(marker)
 
     assert os.environ.get("PYTEST_XDIST_WORKER", "master") == worker_id
-    assert marker in log_file.read_text()
+    assert marker in _read_log_file(log_file)
 
 
 def test_synchronous_file_sink_accepts_concurrent_writes(log_file):
@@ -93,7 +99,7 @@ def test_synchronous_file_sink_accepts_concurrent_writes(log_file):
         list(executor.map(logger.info, messages))
 
     logged_messages = [
-        line.rsplit(" | ", 1)[-1] for line in log_file.read_text().splitlines()
+        line.rsplit(" | ", 1)[-1] for line in _read_log_file(log_file).splitlines()
     ]
     assert sorted(logged_messages) == sorted(messages)
 
@@ -108,7 +114,7 @@ def test_configured_thresholds_are_preserved(capfd, log_file, monkeypatch):
     logger.error("error message")
 
     console_output = capfd.readouterr().err
-    file_output = log_file.read_text()
+    file_output = _read_log_file(log_file)
 
     assert "debug message" not in console_output
     assert "info message" not in console_output
@@ -172,8 +178,10 @@ def test_configured_sink_color_modes():
 
     assert add_sink.call_args_list[0].kwargs["colorize"] is False
     assert add_sink.call_args_list[0].kwargs["format"] is _plain_compact_log_format
+    assert add_sink.call_args_list[0].kwargs["enqueue"] is False
     assert add_sink.call_args_list[1].kwargs["colorize"] is False
     assert add_sink.call_args_list[1].kwargs["format"] is _plain_compact_log_format
+    assert add_sink.call_args_list[1].kwargs["enqueue"] is True
 
 
 def test_windows_log_path_is_passed_to_file_sink(monkeypatch):
@@ -234,7 +242,7 @@ def test_compact_log_format_preserves_exceptions(capfd, log_file):
         '    raise ValueError("example failure")' in console_output
     )
     assert "ValueError: example failure" in console_output
-    file_output = log_file.read_text()
+    file_output = _read_log_file(log_file)
     assert "{exception}" not in console_output
     assert "{exception}" not in file_output
     assert "ValueError: example failure" in file_output
@@ -244,4 +252,4 @@ def test_main_logs_greeting(capfd, log_file):
     main()
     captured = capfd.readouterr()
     assert "Hello from second_brain!" in captured.err
-    assert "Hello from second_brain!" in log_file.read_text()
+    assert "Hello from second_brain!" in _read_log_file(log_file)
