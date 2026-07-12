@@ -83,11 +83,11 @@ tests to read the same file that `configure_logging()` configures. The autouse
 `_isolate_logger` fixture depends on `log_file`, so the environment variable is
 always set before a test runs, even when that test does not request the path
 directly. Its teardown removes all Loguru handlers after every test to prevent
-the global logger singleton from leaking configuration into later tests.
-Access is guarded by a process-local lock, giving each test an isolated logger
-configuration window if a runner schedules tests concurrently in one process;
-multi-process runners already isolate Loguru through separate processes.
+the global logger singleton from leaking configuration into later tests. Tests
+must configure and assert a complete logger scenario within one test function;
+cross-test handler state is intentionally unsupported so test order cannot hide
+handler leaks or configuration mistakes.
 
-Both application sinks explicitly use synchronous writes (`enqueue=False`), so
-tests can read the configured file immediately after emitting a log record
-without waiting for an asynchronous queue to drain.
+The console sink writes synchronously. The file sink is queued, so test helpers
+call `logger.complete()` before reading files and teardown drains the queue
+before removing handlers.
