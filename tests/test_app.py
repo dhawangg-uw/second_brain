@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import PureWindowsPath
 from unittest.mock import patch
@@ -36,6 +37,11 @@ def _read_log_file(log_file):
     """Wait for queued file records, then return their text."""
     logger.complete()
     return log_file.read_text()
+
+
+def _sink_call(add_sink, target):
+    """Return the logger.add() call for a sink without relying on call order."""
+    return next(call for call in add_sink.call_args_list if call.args[0] == target)
 
 
 def _assert_compact_standard_lines(output):
@@ -165,7 +171,7 @@ def test_file_retention_is_preserved():
     ):
         configure_logging()
 
-    assert add_sink.call_args_list[1].kwargs["retention"] == 1
+    assert _sink_call(add_sink, os.environ["LOG_FILE"]).kwargs["retention"] == 1
 
 
 def test_configured_sink_color_modes():
@@ -176,12 +182,14 @@ def test_configured_sink_color_modes():
     ):
         configure_logging()
 
-    assert add_sink.call_args_list[0].kwargs["colorize"] is False
-    assert add_sink.call_args_list[0].kwargs["format"] is _plain_compact_log_format
-    assert add_sink.call_args_list[0].kwargs["enqueue"] is False
-    assert add_sink.call_args_list[1].kwargs["colorize"] is False
-    assert add_sink.call_args_list[1].kwargs["format"] is _plain_compact_log_format
-    assert add_sink.call_args_list[1].kwargs["enqueue"] is True
+    stderr_call = _sink_call(add_sink, sys.stderr)
+    file_call = _sink_call(add_sink, os.environ["LOG_FILE"])
+    assert stderr_call.kwargs["colorize"] is False
+    assert stderr_call.kwargs["format"] is _plain_compact_log_format
+    assert stderr_call.kwargs["enqueue"] is False
+    assert file_call.kwargs["colorize"] is False
+    assert file_call.kwargs["format"] is _plain_compact_log_format
+    assert file_call.kwargs["enqueue"] is True
 
 
 def test_windows_log_path_is_passed_to_file_sink(monkeypatch):
@@ -197,7 +205,7 @@ def test_windows_log_path_is_passed_to_file_sink(monkeypatch):
     ):
         configure_logging()
 
-    assert add_sink.call_args_list[1].args[0] == str(windows_log_file)
+    assert _sink_call(add_sink, str(windows_log_file)).args[0] == str(windows_log_file)
 
 
 def test_compact_formatter_preserves_extra_metadata():
