@@ -94,6 +94,11 @@ must configure and assert a complete logger scenario within one test function;
 cross-test handler state is intentionally unsupported so test order cannot hide
 handler leaks or configuration mistakes.
 
+This dependency also applies under pytest-xdist: every test in every worker
+resolves the autouse fixture, receives a worker-local `tmp_path`, and therefore
+never falls back to the repository's `./app.log`. New tests must not bypass
+pytest fixture setup by invoking test functions directly.
+
 The console sink writes synchronously. The file sink is queued, so test helpers
 call `logger.complete()` before reading files and teardown drains the queue
 before removing handlers.
