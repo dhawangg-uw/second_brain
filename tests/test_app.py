@@ -7,7 +7,6 @@ import pytest
 from loguru import logger
 
 from second_brain.app import (
-    FILE_LOG_RETENTION,
     _compact_log_format,
     configure_logging,
     main,
@@ -135,12 +134,15 @@ def test_success_level_is_registered(log_file):
     assert log_file.parent.exists()
 
 
-def test_retention_value_is_accepted(log_file):
-    """Verify that Loguru accepts the configured retention duration."""
-    configure_logging()
+def test_file_retention_is_preserved():
+    """Verify that compact formatting does not change file retention."""
+    with (
+        patch("second_brain.app.logger.remove"),
+        patch("second_brain.app.logger.add") as add_sink,
+    ):
+        configure_logging()
 
-    assert FILE_LOG_RETENTION == "7 days"
-    assert log_file.parent.exists()
+    assert add_sink.call_args_list[1].kwargs["retention"] == 1
 
 
 def test_windows_log_path_is_passed_to_file_sink(monkeypatch):

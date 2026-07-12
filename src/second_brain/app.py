@@ -9,7 +9,6 @@ LEVEL_LABELS = {
     "WARNING": "WARN",
     "ERROR": "ERR",
 }
-FILE_LOG_RETENTION = "7 days"
 
 
 def _compact_log_format(record):
@@ -48,7 +47,7 @@ def configure_logging():
         level="DEBUG",
         format=_compact_log_format,
         rotation="50 KB",
-        retention=FILE_LOG_RETENTION,
+        retention=1,
         enqueue=False,
     )
 
