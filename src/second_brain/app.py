@@ -62,6 +62,9 @@ def configure_logging():
 
     Both sinks intentionally share the compact field layout required by issue
     #1. Sink-specific behavior belongs in handler options, not separate layouts.
+    Stderr writes synchronously so command-line feedback is immediate; queued
+    serialization is reserved for the rotating file sink. Concurrent callers
+    that require ordered console records should use the file output instead.
     Call this once during single-threaded startup, before worker threads begin;
     reconfiguration removes the currently installed handlers.
 
