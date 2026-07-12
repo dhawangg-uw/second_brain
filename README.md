@@ -104,7 +104,7 @@ Copy `.env.example` to `.env` for local development. Do not commit `.env` or
 | --- | --- | --- |
 | `LOG_LEVEL` | `INFO` | Minimum level displayed on stderr. The development template uses `DEBUG`. |
 | `LOG_FILE` | `app.log` | File path for DEBUG-and-higher logs. The file rotates at 50 KB and retains one backup. |
-| `LOG_COLORIZE` | `false` | Set to `true`, `1`, `yes`, or `on` to enable ANSI colors on stderr. File logs remain plain text. |
+| `LOG_COLORIZE` | `false` | Set to `true`, `t`, `1`, `yes`, `y`, or `on` (case-insensitive) to enable ANSI colors on stderr. File logs remain plain text. |
 
 Tests load `.env.test` through pytest-env. The autouse test fixture redirects
 `LOG_FILE` to pytest's temporary directory, so a test run never writes `app.log`

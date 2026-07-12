@@ -9,7 +9,7 @@ LEVEL_LABELS = {
     "WARNING": "WARN",
     "ERROR": "ERR",
 }
-TRUTHY_ENV_VALUES = {"1", "true", "yes", "on"}
+TRUTHY_ENV_VALUES = {"1", "true", "t", "yes", "y", "on"}
 
 
 def _env_flag(name, *, default=False):

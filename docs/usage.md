@@ -71,7 +71,7 @@ all existing handlers and is not a live-reconfiguration API for active workers.
 |-------------|------------|--------------------------------------|
 | `LOG_LEVEL` | `INFO`     | Console log level (DEBUG, INFO, …)   |
 | `LOG_FILE`  | `app.log`  | Path to the log file                 |
-| `LOG_COLORIZE` | `false` | Enable ANSI colors on stderr with `true`, `1`, `yes`, or `on` |
+| `LOG_COLORIZE` | `false` | Enable ANSI colors on stderr with `true`, `t`, `1`, `yes`, `y`, or `on` (case-insensitive) |
 
 Copy `.env.example` to `.env` for development defaults, then run with `uv run --env-file .env`.
 
