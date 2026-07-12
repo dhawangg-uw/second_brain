@@ -8,8 +8,11 @@ defined in `src/second_brain/app.py`.
 The formatter template is:
 
 ```text
-<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{extra[level_label]}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> | <level>{message}</level>\n{exception}
+<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>LEVEL_LABEL</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> | <level>{message}</level>\n{exception}
 ```
+
+`LEVEL_LABEL` is interpolated by `_level_label(record)` when the callable
+formatter returns this template; it is not stored in `record["extra"]`.
 
 Loguru strips the color markup when the sink does not render colors. A normal
 record therefore has this shape:
