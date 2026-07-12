@@ -68,6 +68,7 @@ def configure_logging():
         level="DEBUG",
         format=_plain_compact_log_format,
         colorize=False,
+        # Issue #1 requires preserving the established file lifecycle policy.
         rotation="50 KB",
         retention=1,
         enqueue=True,
