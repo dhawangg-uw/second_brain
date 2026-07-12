@@ -322,6 +322,23 @@ def test_file_sink_stays_plain_when_console_colors_enabled(log_file, monkeypatch
     assert "\x1b[" not in file_output
 
 
+def test_real_sinks_separate_terminal_markup_from_file_output(
+    capfd, log_file, monkeypatch
+):
+    """Exercise color rendering and stripping through real Loguru sinks."""
+    monkeypatch.setenv("LOG_COLORIZE", "true")
+    configure_logging()
+
+    logger.warning("sink color integration")
+
+    console_output = capfd.readouterr().err
+    file_output = _read_log_file(log_file)
+    assert "\x1b[" in console_output
+    assert "\x1b[" not in file_output
+    assert "<level>" not in file_output
+    assert "sink color integration" in file_output
+
+
 def test_windows_log_path_is_passed_to_file_sink(monkeypatch):
     """Verify that Windows paths reach Loguru without reinterpretation."""
     windows_log_file = PureWindowsPath(
