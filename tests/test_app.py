@@ -1,3 +1,4 @@
+import importlib.metadata
 import os
 import re
 import subprocess
@@ -24,6 +25,16 @@ EXPECTED_LABELS = {
     "error message": "ERR",
 }
 CUSTOM_LEVELS = {"SUCCESS": 25, "TRACE": 5}
+
+
+def test_minimum_loguru_api_contract():
+    """Keep the pinned Loguru floor aligned with APIs used at runtime."""
+    version = tuple(
+        int(part) for part in importlib.metadata.version("loguru").split(".")[:3]
+    )
+    assert version >= (0, 7, 3)
+    assert callable(logger.complete)
+    assert callable(logger.catch)
 
 
 def _ensure_custom_levels_registered():
