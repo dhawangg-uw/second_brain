@@ -379,6 +379,13 @@ def test_environment_flag_parsing(value, expected, monkeypatch):
     assert _env_flag("EXAMPLE_FLAG") is expected
 
 
+def test_environment_flag_warns_for_unrecognized_value(monkeypatch):
+    monkeypatch.setenv("EXAMPLE_FLAG", "maybe")
+
+    with pytest.warns(RuntimeWarning, match="Unrecognized boolean value"):
+        assert _env_flag("EXAMPLE_FLAG") is False
+
+
 def test_file_sink_stays_plain_when_console_colors_enabled(log_file, monkeypatch):
     """Never allow terminal markup or ANSI escapes into the file sink."""
     monkeypatch.setenv("LOG_COLORIZE", "true")

@@ -1,5 +1,6 @@
 import os
 import sys
+import warnings
 from pathlib import Path
 from threading import RLock
 
@@ -12,6 +13,7 @@ LEVEL_LABELS = {
     "ERROR": "ERR",
 }
 TRUTHY_ENV_VALUES = {"1", "true", "t", "yes", "y", "on"}
+FALSEY_ENV_VALUES = {"", "0", "false", "f", "no", "n", "off"}
 _CONFIGURE_LOCK = RLock()
 
 
@@ -30,7 +32,14 @@ def _require_loguru_api():
 def _env_flag(name, *, default=False):
     """Return a case-insensitive boolean flag from the environment."""
     fallback = "true" if default else "false"
-    return os.environ.get(name, fallback).strip().lower() in TRUTHY_ENV_VALUES
+    value = os.environ.get(name, fallback).strip().lower()
+    if value not in TRUTHY_ENV_VALUES | FALSEY_ENV_VALUES:
+        warnings.warn(
+            f"Unrecognized boolean value for {name}: {value!r}; using false",
+            RuntimeWarning,
+            stacklevel=2,
+        )
+    return value in TRUTHY_ENV_VALUES
 
 
 def _prepare_log_parent(log_file):
