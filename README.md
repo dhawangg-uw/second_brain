@@ -8,7 +8,7 @@ documentation.
 
 The project uses these conventions:
 
-- **Python:** 3.13 or newer
+- **Python:** 3.11 or newer
 - **Package manager and build tool:** [uv](https://docs.astral.sh/uv/)
 - **Build backend:** `uv_build`
 - **Package layout:** source code lives in `src/second_brain/`
@@ -57,6 +57,19 @@ uv run second_brain
 This is the installed CLI entry point. It writes an informational greeting to
 stderr and to `app.log` by default.
 
+Log entries use a compact shared format for both destinations:
+
+```text
+YYYY-MM-DD HH:mm:ss | LEVEL | module:function:line | message
+```
+
+Both configured sinks use this deterministic plain-text representation by
+default. Terminal colors can be enabled for stderr with `LOG_COLORIZE`.
+
+Milliseconds and level padding are omitted. The standard `WARNING` and `ERROR`
+levels are displayed as `WARN` and `ERR`; `DEBUG` and `INFO` retain their names.
+Other Loguru levels retain their original names.
+
 ### Run with development settings
 
 Create your local environment file once:
@@ -91,6 +104,11 @@ Copy `.env.example` to `.env` for local development. Do not commit `.env` or
 | --- | --- | --- |
 | `LOG_LEVEL` | `INFO` | Minimum level displayed on stderr. The development template uses `DEBUG`. |
 | `LOG_FILE` | `app.log` | File path for DEBUG-and-higher logs. The file rotates at 50 KB and retains one backup. |
+| `LOG_COLORIZE` | `false` | Set to `true`, `t`, `1`, `yes`, `y`, or `on` (case-insensitive) to enable ANSI colors on stderr. File logs remain plain text. |
+
+When `LOG_FILE` points into a directory tree that does not exist, startup
+creates the parent directories before configuring Loguru. Startup fails with a
+clear configuration error if the directory or file cannot be written.
 
 Tests load `.env.test` through pytest-env. The autouse test fixture redirects
 `LOG_FILE` to pytest's temporary directory, so a test run never writes `app.log`
@@ -109,6 +127,18 @@ Run tests with coverage (the project requires at least 80% coverage):
 ```bash
 uv run pytest --cov
 ```
+
+Run tests in parallel processes with pytest-xdist:
+
+```bash
+uv run --group parallel pytest -n auto
+```
+
+`pytest-xdist` and `execnet` live in the optional `parallel` dependency group,
+which is locked in `uv.lock` and installed only when `--group parallel` is used,
+so standard development and CI environments do not install process-level test
+tooling unless they run this job. Each worker has its own process-local Loguru
+singleton, and fixture teardown drains queued records before removing handlers.
 
 Check style and automatically format files:
 

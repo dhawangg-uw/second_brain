@@ -7,8 +7,8 @@ name = "second-brain"
 version = "0.0.1"
 description = "A Python application."
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = ["loguru"]
+requires-python = ">=3.11"
+dependencies = ["loguru>=0.7.3"]
 
 [project.scripts]
 second_brain = "second_brain.app:main"
@@ -23,10 +23,11 @@ dev = [
     "mkdocs-material>=9.6",
     "mkdocstrings[python]>=0.27",
 ]
+parallel = ["pytest-xdist>=3.8"]
 
 [tool.ruff]
 line-length = 88
-target-version = "py313"
+target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "B", "I", "UP"]
