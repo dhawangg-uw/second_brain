@@ -218,6 +218,18 @@ def test_compact_formatter_handles_malformed_level(record):
     assert "<level>UNKNOWN</level>" in _compact_log_format(record)
 
 
+def test_compact_formatter_accepts_real_loguru_record():
+    """Verify compatibility with records produced by the installed Loguru."""
+    records = []
+    sink_id = logger.add(lambda message: records.append(message.record))
+    try:
+        logger.info("real record")
+    finally:
+        logger.remove(sink_id)
+
+    assert "INFO |" in _plain_compact_log_format(records[0])
+
+
 def test_compact_log_format_preserves_exceptions(capfd, log_file):
     """Verify that exception details follow the compact log line."""
     configure_logging()
