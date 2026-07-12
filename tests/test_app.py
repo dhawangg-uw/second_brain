@@ -278,3 +278,12 @@ def test_main_logs_greeting(capfd, log_file):
     captured = capfd.readouterr()
     assert "Hello from second_brain!" in captured.err
     assert "Hello from second_brain!" in _read_log_file(log_file)
+
+
+def test_main_logs_and_reraises_unexpected_errors():
+    """Keep CLI failures visible to callers after Loguru records them."""
+    with (
+        patch("second_brain.app.configure_logging", side_effect=RuntimeError("boom")),
+        pytest.raises(RuntimeError, match="boom"),
+    ):
+        main()

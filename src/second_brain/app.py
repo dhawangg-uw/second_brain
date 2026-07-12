@@ -75,7 +75,7 @@ def configure_logging():
     )
 
 
-@logger.catch
+@logger.catch(reraise=True)
 def main():
     """Run the application.
 
