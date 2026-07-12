@@ -64,6 +64,8 @@ def _compact_log_format(record):
 
     Compute the display label locally so formatting leaves both the record's
     native level and its caller-provided ``extra`` metadata unchanged.
+    Keep this callable at module scope: queued sinks and spawn-based workers
+    require the formatter object to remain importable and picklable.
     """
     level_label = _level_label(record)
     return (
@@ -75,7 +77,11 @@ def _compact_log_format(record):
 
 
 def _plain_compact_log_format(record):
-    """Return a markup-free compact format for non-terminal sinks."""
+    """Return a markup-free, module-level format for queued file sinks.
+
+    Like the colored formatter, this must remain importable and picklable for
+    spawn-based multiprocessing.
+    """
     level_label = _level_label(record)
     return (
         "{time:YYYY-MM-DD HH:mm:ss} | "
